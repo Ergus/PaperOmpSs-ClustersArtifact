@@ -1,0 +1,117 @@
+\documentclass{article}
+\pagestyle{plain}
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[skip=-2pt]{subcaption}
+\usepackage[skip=5pt]{caption}
+\usepackage[pdftex,
+            pdfauthor=Jimmy Aguilar Mena,
+            pdftitle={OmpSs-2@Cluster: Distributed memory execution of nested OpenMP-style tasks},
+            pdfsubject={Europar-2022},
+            pdfkeywords={OmpSs-2,Task,Cluster},
+            pdfproducer={Latex with hyperref},
+            pdfcreator={pdflatex}]{hyperref}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{sansmath}
+
+\newcommand{\prag}[1]{\textcolor{blue}{#1}}
+
+\lstset{breaklines=true, tabsize=4, basicstyle=\tiny, language=C,
+  numbers=left,                    % where to put the line-numbers; possible
+  otherkeywords={pragma,\# },
+}
+
+\usepackage[T1]{fontenc}
+\usepackage{multirow}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+% \newcolumntype{y}[1]{>{\raggedleft\hspace{0pt}}p{#1}}
+% \newcolumntype{y}{>{\raggedright }l}
+% \newcolumntype{x}[1]{>{\raggedright\hspace{0pt}}p{#1}}
+
+\begin{document}
+
+\title{OmpSs-2@Cluster: Distributed memory execution of nested OpenMP-style tasks}
+
+% \author{
+%   Jimmy Aguilar Mena\inst{1} \and %\orcidID{0000-0001-6802-2247} \and
+%   Omar Shaaban\inst{1} \and %\ordicID{0000-0003-4410-5317} \and
+%   Vicen\c{c} Beltran\inst{1} \and %\orcidID{0000-0002-3580-9630} \and
+%   Paul Carpenter\inst{1} \and %\orcidID{0000-0002-9392-0521} \and
+%   Eduard Ayguade\inst{1} \and %\orcidID{0000-0002-5146-103X} \and
+%   Jesus Labarta\inst{1} %\orcidID{0000-0002-7489-4727}
+% }
+%\institute{Barcelona Supercomputing Center}
+
+\maketitle
+
+This paper it about features implemented in OmpSs-2@Cluster, so the
+first step to reproduce the results is to install Nanos6 and the
+source to source compiler Mercurium to create a functional setup.
+
+\section{System, Dependencies and Environment}
+
+We evaluate OmpSs-2@Cluster on MareNostrum\,4. Each node has two
+24-core Intel Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48
+cores per node.  Each socket has a shared 32\,MB L3 cache.  The HPL
+Rmax performance equates to 1.01\,TF per socket.
+
+In general any GNU/Linux system allowing memory over-subscription and
+disable address space randomization may work with no problem.
+
+
+The runtime dependencies are:
+
+\begin{enumerate}
+    \item automake, autoconf, libtool, pkg-config and make
+
+    \item C and C++ compiler to build the runtime and the compiler; we have
+        tested gcc\,7.2.0 and icpc\,2018.1 and they both work without issues.
+        \footnote{To build the tests with Mercurium provides different executables;
+        in order to use gcc/g++ (mcc/mcxx) or icc (imc/imcxx).}
+
+    \item boost >= 1.59. In our experiments we use boost\,1.64.0.
+
+    \item hwloc. If you use OpenMPI then it will be a dependency as there are some
+        version constrains between OpenMPI and hwloc. In our experiments we use
+        version 1.11.8
+
+    \item numactl
+
+    \item MPI library. Our communication uses Intel MPI\,2018.4 over 100\,Gb/s Intel
+        OmniPath, with an HFI Silicon 100 series PCIe adaptor. To build Nanos6
+        with cluster support we require an MPI version with
+        MPI\_THREAD\_MULTIPLE support.  Intel MPI\,2018.4 can be freely
+        downloaded from the Intel website; but the runtime works with OpenMPI
+        and MPICH as well. \footnote{The final results may strongly depend of
+        the MPI multithread support and optimization; we observed degraded
+        performance results when using OpenMPI.}
+\end{enumerate}
+
+We have two different set of benchmarks for MPI and
+OmpSs-2@Cluster. They use the same libraries, compiler and
+dependencies than before but require two extra dependencies.
+
+\begin{enumerate}
+    \item cmake>3.12.4 to build the benchmarks.
+    \item BLASS, in our experiments we use MKL\,2018.4. There is a set of benchmarks
+        that don't use BLASS kernels, but they are not recommended as some of the
+        results may vary from the ones reported in the paper.
+\end{enumerate}
+
+\section{Nanos6 installation}
+
+The nanos6 basic installation instructions are in:
+\url{https://github.com/bsc-pm/nanos6-cluster} which explains the
+dependencies and some extra features.  OmpSs-2@Cluster have similar
+setup to build but with some details.
+
+
+
+\end{document}

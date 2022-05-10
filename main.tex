@@ -16,15 +16,29 @@
             pdfproducer={Latex with hyperref},
             pdfcreator={pdflatex}]{hyperref}
 \usepackage{booktabs}
+
 \usepackage{listings}
+\lstset{numbers=left,numberblanklines=false,escapeinside={(*}{*)},basicstyle=\tiny,language=bash}
+
+
+
+\let\origthelstnumber\thelstnumber
+
+\newcommand*\Suppressnumber{%
+  \lst@AddToHook{OnNewLine}{%
+    \let\thelstnumber\relax%
+     \advance\c@lstnumber-\@ne\relax%
+    }%
+}
+\newcommand*\Reactivatenumber{%
+  \lst@AddToHook{OnNewLine}{%
+   \let\thelstnumber\origthelstnumber%
+   \advance\c@lstnumber\@ne\relax}%
+}
+
 \usepackage{sansmath}
 
 \newcommand{\prag}[1]{\textcolor{blue}{#1}}
-
-\lstset{breaklines=true, tabsize=4, basicstyle=\tiny, language=C,
-  numbers=left,                    % where to put the line-numbers; possible
-  otherkeywords={pragma,\# },
-}
 
 \usepackage[T1]{fontenc}
 \usepackage{multirow}
@@ -82,8 +96,6 @@ The runtime dependencies are:
         version constrains between OpenMPI and hwloc. In our experiments we use
         version 1.11.8
 
-    \item numactl
-
     \item MPI library. Our communication uses Intel MPI\,2018.4 over 100\,Gb/s Intel
         OmniPath, with an HFI Silicon 100 series PCIe adaptor. To build Nanos6
         with cluster support we require an MPI version with
@@ -105,13 +117,56 @@ dependencies than before but require two extra dependencies.
         results may vary from the ones reported in the paper.
 \end{enumerate}
 
-\section{Nanos6 installation}
+\section{Build and install}
+
+\subsection{Nanos6 build and installation}
 
 The nanos6 basic installation instructions are in:
 \url{https://github.com/bsc-pm/nanos6-cluster} which explains the
-dependencies and some extra features.  OmpSs-2@Cluster have similar
-setup to build but with some details.
+dependencies and some other features.  OmpSs-2@Cluster has the same
+setup and requirements but require only MPI as an extra dependency.
 
+\begin{lstlisting}
+git clone --depth 1 https://github.com/bsc-pm/nanos6-cluster
+cd nanos6-cluster
+autoreconf -vif
+export NANOS6_HOME=/some/path1
+./configure --enable-cluster --enable-execution-workflow --prefix=${NANOS6_HOME} \
+            --disable-lint-instrumentation --disable-ctf-instrumentation \
+            --disable-graph-instrumentation --disable-stats-instrumentation \
+            --disable-extrae-instrumentation --disable-verbose-instrumentation
+make -j install
+\end{lstlisting}
 
+As usual the options CC=gcc CXX=g++ can be used to specify the C and
+C++ compilers --with-boost= to specify BOOST path in case it is not in
+the default path.
+
+\subsection{Mercurium build and installation}
+
+\begin{lstlisting}
+git clone --depth 1 https://github.com/bsc-pm/mcxx
+cd mcxx
+autoreconf -vif
+export MERCURIUM_HOME=/some/path2
+./configure --prefix=${MERCURIUM_HOME} --with-nanos6=${NANOS6_HOME} --enable-ompss-2
+make -j install
+export PATH=${MERCURIUM_HOME}/bin:${PATH}
+export MERCURIUM_CC=mcc
+export MERCURIUM_CXX=mcxx
+export MERCURIUM_FC=mfc
+\end{lstlisting}
+
+\subsection{Benchmark build and test}
+
+\begin{lstlisting}
+git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
+mkdir nanos-cluster-benchmarks/build
+cd nanos-cluster-benchmarks/build
+cmake ..
+make
+\end{lstlisting}
+
+If you have some issues detecting the MPI 
 
 \end{document}

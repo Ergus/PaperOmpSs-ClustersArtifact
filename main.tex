@@ -136,6 +136,7 @@ export NANOS6_HOME=/some/path1
             --disable-graph-instrumentation --disable-stats-instrumentation \
             --disable-extrae-instrumentation --disable-verbose-instrumentation
 make -j install
+cd -
 \end{lstlisting}
 
 As usual the options CC=gcc CXX=g++ can be used to specify the C and
@@ -152,9 +153,7 @@ export MERCURIUM_HOME=/some/path2
 ./configure --prefix=${MERCURIUM_HOME} --with-nanos6=${NANOS6_HOME} --enable-ompss-2
 make -j install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
-export MERCURIUM_CC=mcc
-export MERCURIUM_CXX=mcxx
-export MERCURIUM_FC=mfc
+cd -
 \end{lstlisting}
 
 \subsection{Benchmark build and test}
@@ -163,10 +162,87 @@ export MERCURIUM_FC=mfc
 git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
-cmake ..
+cmake --BUILD_TYPE=Release ..
 make
+export NANOS6_CONFIG=${PWD}/nanos6.toml
 \end{lstlisting}
 
-If you have some issues detecting the MPI 
+By default cmake will try to use the gcc compiler, to use icc it is possible to pass:
+\begin{lstlisting}
+cmake -DCCOMPILER=intel ..
+\end{lstlisting}
+
+By default cmake will try to build with the system Lapack library
+following the cmake policy:
+\href{https://cmake.org/cmake/help/latest/module/FindLAPACK.html}{FindLAPACK}
+ \href{https://cmake.org/cmake/help/latest/module/FindBLAS.html}{FindBLAS}
+
+We added a special option \code{-DWITH\_MKL=true} to simplify to force
+using Intel MKL (recommended).
+
+If everything was right all the tests may be build now with the
+submission scripts in their sub-directories. In an interactive session
+you may try: \code{ctest} to check if they can run in your system.
+
+\subsection{Running benchmarks}
+
+\subsubsection{Running benchmarks interactively}
+To execute a benchmark in an interactive session you just need to do
+(from the build directory):
+
+\begin{lstlisting}
+cd jacobi_ompss2
+mpirun -np $NP ./jacobi_task_fetchall_blas_ompss2 $DIM $BS $ITS
+\end{lstlisting}
+
+Where \code{\$NP} is the number of processes to use, \code{\$DIM} the
+problem dimension, \code{\$BS} the block size and \code{\$ITS} the
+number of iterations to execute.
+
+One example execution and it output may be:
+\begin{lstlisting}
+> mpirun -np 2 ./jacobi_task_nofetch_blas_ompss2 1024 16 4
+
+# Initializing data
+# Starting algorithm
+# jacobi tasks FETCHTASK=0
+# Finished algorithm...
+Executable: "./jacobi_task_nofetch_blas_ompss2"
+Rows: 1024
+Tasksize: 16
+Iterations: 4
+Print: 0
+worldsize: 2
+cpu_count: 24
+namespace_enabled: 1
+nanos6_version: "2.5.1 2022-05-08 21:40:06 +0200 2a61a546"
+Total_time: 9.47129e+07
+Algorithm_time: 7.96941e+07
+\end{lstlisting}
+
+\subsubsection{Running benchmarks on a Slurm cluster}
+We also provide the scripts to submit the jobs in a cluster with Slurm
+in case your system has such a setup.
+
+The submit scripts are inside every just created benchmark directory
+named \code{submiter\_dim.sh}. The submit scripts multiple command line
+options that you can read directly in the file:
+
+For example:
+
+\begin{lstlisting}
+./submiter_dim.sh -D 32768 -B 32,64 -N 1,2,3 -I 5 -R 3 -C 24 -o results exe1 exe2 exe3
+\end{lstlisting}
+
+This will submit 3 jobs for 1,2 and 3 nodes (-N) respectively. That
+will run the executables: \code{exe1}, \code{exe2} and \code{exe3} on
+a loop 3 times each each (-R) with 24 cores per process (-C) and will
+create a directory \code{results} (-o) to save all the outputs. With
+matrix dimension 32768 (-D), block sizes of 32 and 64 (-B) and for 5
+iterations (-I).
+
+This script also creates a file inside results
+\code{results/submit.log} with information about the submitted jobs in
+case you need to re-check them latter.
 
 \end{document}

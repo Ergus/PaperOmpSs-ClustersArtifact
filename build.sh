@@ -1,9 +1,10 @@
 #!/bin/bash
 
-set -o xtrace
+set -x
 set -e
 
-[ -z $@ ] && args="build exec process graph" || args="$@"
+# Redirect all the outputs to the logfile
+exec &> >(tee -a "nanos6_automatic_build.log")
 
 echo "# Starting OmpSs-2@Cluster installation."
 export STARTDIR=${PWD}
@@ -39,8 +40,8 @@ git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
-make
-export NANOS6_CONFIG=${PWD}/nanos6.toml
+make # Don't add -j here
+export NANOS6_CONFIG=${STARTDIR}/nanos6.toml
 
 echo "# Start mpi-benchmarks build"
 cd ${STARTDIR}
@@ -49,7 +50,7 @@ git clone --depth=1 --recursive https://github.com/Ergus/MPI_Benchmarks
 mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
-make
+make # Don't add -j here
 
 echo "# If you see this line installation succeeded!!"
 echo "# Please to run the benchmarks remember to export the following variables:"

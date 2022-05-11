@@ -158,6 +158,13 @@ cd -
 
 \subsection{Benchmark build and test}
 
+The MPI benchmarks are in different repositories so we need to build
+them appart. This is a requirement because cmake does not allow to use
+different compilers in the same project; and the MPI benchmarks does
+not need to use mercurium.
+
+For the OmpSs-2@Cluster benchmarks:
+
 \begin{lstlisting}
 git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
@@ -165,17 +172,31 @@ cd nanos-cluster-benchmarks/build
 cmake --BUILD_TYPE=Release ..
 make
 export NANOS6_CONFIG=${PWD}/nanos6.toml
+cd ../../
 \end{lstlisting}
 
-By default cmake will try to use the gcc compiler, to use icc it is possible to pass:
+For MPI benchmarks:
+
+\begin{lstlisting}
+ git clone --depth=1 --recursive https://github.com/Ergus/MPI_Benchmarks
+mkdir MPI_Benchmarks/build
+cd MPI_Benchmarks/build
+cmake --BUILD_TYPE=Release ..
+make
+cd ../../
+\end{lstlisting}
+
+By default cmake will try to use the gcc compiler; to use icc it is
+possible to pass the option -DCCOMPILER to cmake.
+
 \begin{lstlisting}
 cmake -DCCOMPILER=intel ..
 \end{lstlisting}
 
-By default cmake will try to build with the system Lapack library
+By default cmake will try to build with the system's Lapack library
 following the cmake policy:
 \href{https://cmake.org/cmake/help/latest/module/FindLAPACK.html}{FindLAPACK}
- \href{https://cmake.org/cmake/help/latest/module/FindBLAS.html}{FindBLAS}
+\href{https://cmake.org/cmake/help/latest/module/FindBLAS.html}{FindBLAS}
 
 We added a special option \code{-DWITH\_MKL=true} to simplify to force
 using Intel MKL (recommended).
@@ -186,7 +207,11 @@ you may try: \code{ctest} to check if they can run in your system.
 
 \subsection{Running benchmarks}
 
-\subsubsection{Running benchmarks interactively}
+The following instructions apply to MPI and OmpSs-2@Cluster
+benchmarks.  They are executed in the same way, the command line
+arguments are the same, the submission scripts and everything else.
+
+\subsubsection{OmpSs benchmarks (interactively)}
 To execute a benchmark in an interactive session you just need to do
 (from the build directory):
 
@@ -220,9 +245,9 @@ Total_time: 9.47129e+07
 Algorithm_time: 7.96941e+07
 \end{lstlisting}
 
-\subsubsection{Running benchmarks on a Slurm cluster}
-We also provide the scripts to submit the jobs in a cluster with Slurm
-in case your system has such a setup.
+\subsubsection{OmpSs benchmarks (Slurm cluster submit)}
+The repository also provide the scripts to submit the jobs in a
+cluster with Slurm in case your system has such a setup.
 
 The submit scripts are inside every just created benchmark directory
 named \code{submiter\_dim.sh}. The submit scripts multiple command line
@@ -244,5 +269,7 @@ iterations (-I).
 This script also creates a file inside results
 \code{results/submit.log} with information about the submitted jobs in
 case you need to re-check them latter.
+
+
 
 \end{document}

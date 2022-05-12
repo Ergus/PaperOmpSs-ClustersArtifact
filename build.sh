@@ -62,27 +62,27 @@ echo "Start running a benchmark subset."
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/matmul_matvec_ompss2
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 1 \
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 5 \
 	matvec_strong_flat_task_node_blas_ompss2 \
 	matvec_weak_fetchall_task_node_blas_ompss2 \
 	matvec_parallelfor_blas_mpi | tee ${STARTDIR}/output_matvec.txt
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matmul_parallelfor_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 16 -I 1 \
+./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 16 -I 5 \
 	matmul_strong_nested_task_node_blas_ompss2 \
 	matmul_weak_fetchall_task_node_blas_ompss2 \
 	matmul_parallelfor_blas_mpi | tee ${STARTDIR}/output_matmul.txt
 
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/jacobi_ompss2
 cp ${STARTDIR}/MPI_Benchmarks/build/jacobi_mpi/jacobi_parallelfor_nop2p_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 1 \
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 5 \
 	jacobi_task_fetchall_blas_ompss2 \
 	jacobi_taskfor_blas_ompss2 \
 	jacobi_parallelfor_nop2p_blas_mpi | tee ${STARTDIR}/output_jacobi.txt
 
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/cholesky_fare_ompss2
 cp ${STARTDIR}/MPI_Benchmarks/build/cholesky_mpi/cholesky_omp_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 512 -I 1 \
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 512 -I 0 \
 	cholesky_fare_strong_ompss2 \
 	cholesky_fare_taskfor_ompss2 \
 	cholesky_omp_mpi | tee ${STARTDIR}/output_cholesky.txt

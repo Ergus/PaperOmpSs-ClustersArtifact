@@ -79,54 +79,63 @@ Rmax performance equates to 1.01\,TF per socket.
 In general any GNU/Linux system allowing memory over-subscription and
 disable address space randomization may work with no problem.
 
-
-The runtime dependencies are:
+To build execute and create all the graphs we have these dependencies:
 
 \begin{enumerate}
-    \item automake, autoconf, libtool, pkg-config and make
+    \item automake, autoconf, libtool, pkg-config and make.
 
-    \item C and C++ compiler to build the runtime and the compiler; we have
-        tested gcc\,7.2.0 and icpc\,2018.1 and they both work without issues.
-        \footnote{To build the tests with Mercurium provides different executables;
+    \item C and C++ compiler: to build the nanos6, Mercurium and the benchmarks;
+        we have tested gcc\,7.2.0 and icpc\,2018.1 and they both work without
+        issues.
+        \footnote{To build the tests Mercurium provides different executables;
         in order to use gcc/g++ (mcc/mcxx) or icc (imc/imcxx).}
 
-    \item boost >= 1.59. In our experiments we use boost\,1.64.0.
+    \item bison, gperf, libsqlite3 and flex: to build mercurium
 
-    \item hwloc. If you use OpenMPI then it will be a dependency as there are some
+    \item boost >= 1.59: In our experiments we use boost\,1.64.0.
+
+    \item hwloc: If you use OpenMPI then it will be a dependency as there are some
         version constrains between OpenMPI and hwloc. In our experiments we use
-        version 1.11.8
+        version 1.11.8.
 
-    \item MPI library. Our communication uses Intel MPI\,2018.4 over 100\,Gb/s Intel
-        OmniPath, with an HFI Silicon 100 series PCIe adaptor. To build Nanos6
-        with cluster support we require MPI with
-        \code{MPI\_THREAD\_MULTIPLE} support.  Intel MPI\,2018.4 can be freely
-        downloaded from the Intel website; but the runtime works with OpenMPI
-        and MPICH as well. \footnote{The final results may strongly depend of
-        the MPI multithread support and optimization; we observed degraded
-        performance results when using OpenMPI.}
-\end{enumerate}
+    \item MPI library \code{MPI\_THREAD\_MULTIPLE} support. Our communication
+        uses Intel MPI\,2018.4 over 100\,Gb/s Intel OmniPath, with an HFI Silicon
+        100 series PCIe adaptor.  IMPI can be freely downloaded from the Intel
+        website; but the runtime works with OpenMPI and MPICH as well.
+        \footnote{The final results may strongly depend of the MPI multithread
+        support and optimization; we observed degraded performance results
+        when using OpenMPI.}
 
-We need some extra dependencies to build mercurium. They are usually
-installed in most of the systems, but in case you have some dependency
-issues you may check for: bison, gperf, libsqlite3 and flex.
+    \item cmake >= 3.10 and Blas/Lapack: to build the optimized benchmarks.
 
-We have two different set of benchmarks for MPI and
-OmpSs-2@Cluster. They use the same libraries, compiler and
-dependencies than before but require two extra dependencies.
+    \item python3, matplotlib and pandas: to process the outputs and generate the graphics.
 
-\begin{enumerate}
-    \item cmake>3.10 to build the benchmarks.
-    \item BLASS, in our experiments we use MKL\,2018.4. There is a set of benchmarks
-        that don't use BLASS kernels, but they are not recommended as some of the
-        results may vary from the ones reported in the paper.
 \end{enumerate}
 
 Finally to process the output data and generate the graphs we use
-python3, with matplotlib, numpy and pandas.
+python3, with matplotlib and pandas.
 
 \section{Build and install}
 
-\subsection{Nanos6 build and installation}
+We provide the script \code{build.sh} to automatize the steps
+explained in this section. The script contains the same problem sizes
+and number of iterations used in the document. Such executions make
+take several hours to complete all the experiments, specially in
+smaller systems. For quick tests we recommend to divide by 4 every
+problem size (-D) and reduce the number of executions (-R) to
+1-3.\footnote{In cholesky the -I parameter needs to be always zero.}
+
+The script build.sh builds and downloads everything in the caller
+directory (cwd). And creates a new file
+\code{nanos6\_automatic\_build.log} that we can use to check and solve
+issues.
+
+The outputs are added in the same directory in different files that we
+can process latter with the python script \code{process\_dim.py}.
+
+The full download, build and installation may take about 30 minutes. 
+
+\subsection{Nanos6 and Mercurium build and installation}
 
 The nanos6 basic installation instructions are in:
 \url{https://github.com/bsc-pm/nanos6-cluster} which explains the
@@ -150,7 +159,7 @@ As usual the options CC=gcc CXX=g++ can be used to specify the C and
 C++ compilers --with-boost= to specify BOOST path in case it is not in
 the default path.
 
-\subsection{Mercurium build and installation}
+For Mercurium compiler these are the basic steps.
 
 \begin{lstlisting}
 cd ${STARTDIR}
@@ -184,7 +193,7 @@ make
 export NANOS6_CONFIG=${STARTDIR}/nanos6.toml
 \end{lstlisting}
 
-For MPI benchmarks:
+For the MPI benchmarks:
 
 \begin{lstlisting}
 cd ${STARTDIR}
@@ -196,11 +205,7 @@ make
 \end{lstlisting}
 
 By default cmake will try to use the gcc compiler; to use icc it is
-possible to pass the option -DCCOMPILER to cmake.
-
-\begin{lstlisting}
-cmake -DCCOMPILER=intel ..
-\end{lstlisting}
+possible to pass the option \code{-DCCOMPILER=intel} to cmake.
 
 By default cmake will try to build with the system's Lapack library
 following the cmake policy:
@@ -216,13 +221,18 @@ you may try: \code{ctest} to check if they can run in your system.
 
 \subsection{Running benchmarks}
 
+We provide two sets of scripts to run the benchmarks:
+\code{interactive\_dim.sh} and \code{submiter\_dim.sh}.
+
 The following instructions apply to MPI and OmpSs-2@Cluster
 benchmarks.  They are executed in the same way, the command line
-arguments are the same, the submission scripts and everything else.
+arguments, outputs and submission scripts are all similes.
 
 \subsubsection{OmpSs benchmarks (interactively)}
-To execute a benchmark in an interactive session you just need to do
-(from the build directory):
+To execute a benchmark in an interactive session you just need to go
+to the build directory and execute it as a normal MPI aplication, the
+OmpSs-2@Cluster runtime relies on MPI to distribute the processes and
+communicate:
 
 \begin{lstlisting}
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/jacobi_ompss2
@@ -254,9 +264,13 @@ Total_time: 9.47129e+07
 Algorithm_time: 7.96941e+07
 \end{lstlisting}
 
-Our repository provides a script \code{interactive\_dim.sh} to execute
-the benchmarks interactively. The script is automatically copied into
-the executable directories and its use is very simple:
+If you see the output duplicated it means that the cluster mode was
+not properly set, so probably you are setting a wrong value for \code{NANOS6\_CONFIG}.
+
+The benchmark repository provides a script \code{interactive\_dim.sh}
+to execute multiple benchmarks interactively. The script is
+automatically copied into the build directories and its use is very
+simple:
 
 \begin{lstlisting}
 ./interactive_dim.sh -N 1,2 -R 1 -D 32768 -B 64 -I 1 exe1 exe2 exe3
@@ -268,15 +282,15 @@ the executable files: \code{exe1}, \code{exe2} and
 problem dimension of \code{32768} (-D), block size \code{64} (-B) and
 for \code{5} iterations (-I).
 
-
 \subsubsection{OmpSs benchmarks (Slurm cluster submit)}
 
-The repository also provide the scripts to submit the jobs in a
-cluster with Slurm in case your system has such a setup.
+If your system uses slurm and you are not in an interactive session,
+then you can use a \code{submiter\_dim.sh} in the same way than
+\code{interactive\_dim.sh}. 
 
-The submit scripts are inside every just created benchmark directory
-named \code{submiter\_dim.sh}. The submit scripts multiple command line
-options that you can read directly in the file:
+The submit scripts accepts extra command line arguments to specify
+partitions, walltime, and other slurm specific options. You can read
+that directly in the file.
 
 For example:
 
@@ -302,39 +316,51 @@ To partially reproduce some of the results in the paper the execution
 may require to use a big setup (up to 16 nodes and 48 cores per node
 in two numa nodes). You can reduce the problem size (-D), the number
 of iterations (-I) and the time the experiments are repeated (-R) to
-reduce the execution time. This same commands can be used either with
-the interactive or the submit scripts.
+reduce the execution time. This similar commands can be used either
+with the interactive or the submit scripts.
 
 \begin{lstlisting}
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/matmul_matvec_ompss2
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 1 \
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 5 \
 	matvec_strong_flat_task_node_blas_ompss2 \
 	matvec_weak_fetchall_task_node_blas_ompss2 \
 	matvec_parallelfor_blas_mpi | tee ${STARTDIR}/output_matvec.txt
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matmul_parallelfor_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 16 -I 1 \
+./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 16 -I 5 \
 	matmul_strong_nested_task_node_blas_ompss2 \
 	matmul_weak_fetchall_task_node_blas_ompss2 \
 	matmul_parallelfor_blas_mpi | tee ${STARTDIR}/output_matmul.txt
 
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/jacobi_ompss2
 cp ${STARTDIR}/MPI_Benchmarks/build/jacobi_mpi/jacobi_parallelfor_nop2p_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 1 \
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 5 \
 	jacobi_task_fetchall_blas_ompss2 \
 	jacobi_taskfor_blas_ompss2 \
 	jacobi_parallelfor_nop2p_blas_mpi | tee ${STARTDIR}/output_jacobi.txt
 
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/cholesky_fare_ompss2
 cp ${STARTDIR}/MPI_Benchmarks/build/cholesky_mpi/cholesky_omp_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 512 -I 1 \
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 512 -I 0 \
 	cholesky_fare_strong_ompss2 \
 	cholesky_fare_taskfor_ompss2 \
 	cholesky_omp_mpi | tee ${STARTDIR}/output_cholesky.txt
-
 \end{lstlisting}
+
+\footnote{In cholesky the -I parameter needs to be always zero.}
+
+The previous lines should produce 4 output files with the numeric
+results: \code{output\_matvec.txt}, \code{output\_matmul.txt}
+\code{output\_jacobi.txt} and \code{output\_cholesky.txt}.
+
+To process these files there is a python script:
+
+\begin{lstlisting}
+./process_dim.py output_matvec.txt output_matmul.txt output_jacobi.txt output_cholesky.txt
+\end{lstlisting}
+
 
 \end{document}
 

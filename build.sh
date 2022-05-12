@@ -17,7 +17,7 @@ export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
             --disable-lint-instrumentation --disable-ctf-instrumentation \
             --disable-graph-instrumentation --disable-stats-instrumentation \
             --disable-extrae-instrumentation --disable-verbose-instrumentation
-make -j install
+make install
 
 echo "# Starting Mercurium installation."
 cd ${STARTDIR}
@@ -29,7 +29,7 @@ export MERCURIUM_HOME=${STARTDIR}/mcxx-install
 ./configure --prefix=${MERCURIUM_HOME} \
             --with-nanos6=${NANOS6_HOME} \
             --enable-ompss-2
-make -j install
+make install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
 
 echo "# Start nanos-cluster-benchmarks build"
@@ -38,7 +38,7 @@ rm -rf nanos-cluster-benchmarks
 git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
-cmake --CMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 export NANOS6_CONFIG=${PWD}/nanos6.toml
 
@@ -48,7 +48,7 @@ rm -rf MPI_Benchmarks
 git clone --depth=1 --recursive https://github.com/Ergus/MPI_Benchmarks
 mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
-cmake --CMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 
 echo "# If you see this line installation succeeded!!"

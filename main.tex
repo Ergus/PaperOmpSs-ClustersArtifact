@@ -106,16 +106,23 @@ The runtime dependencies are:
         performance results when using OpenMPI.}
 \end{enumerate}
 
+We need some extra dependencies to build mercurium. They are usually
+installed in most of the systems, but in case you have some dependency
+issues you may check for: bison, gperf, libsqlite3 and flex.
+
 We have two different set of benchmarks for MPI and
 OmpSs-2@Cluster. They use the same libraries, compiler and
 dependencies than before but require two extra dependencies.
 
 \begin{enumerate}
-    \item cmake>3.12.4 to build the benchmarks.
+    \item cmake>3.10 to build the benchmarks.
     \item BLASS, in our experiments we use MKL\,2018.4. There is a set of benchmarks
         that don't use BLASS kernels, but they are not recommended as some of the
         results may vary from the ones reported in the paper.
 \end{enumerate}
+
+Finally to process the output data and generate the graphs we use
+python3, with matplotlib, numpy and pandas.
 
 \section{Build and install}
 
@@ -302,25 +309,24 @@ the interactive or the submit scripts.
 \begin{lstlisting}
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/matmul_matvec_ompss2
 
-cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_mpi .
+cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_blas_mpi .
 ./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 1 \
 	matvec_strong_flat_task_node_blas_ompss2 \
 	matvec_weak_fetchall_task_node_blas_ompss2 \
-	matvec_parallelfor_mpi | tee output_matvec.txt
+	matvec_parallelfor_blas_mpi | tee output_matvec.txt
 
-cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matmul_parallelfor_mpi .
+cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matmul_parallelfor_blas_mpi .
 ./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 16 -I 1 \
 	matmul_strong_nested_task_node_blas_ompss2 \
 	matmul_weak_fetchall_task_node_blas_ompss2 \
-	matmul_parallelfor_mpi | tee output_matmul.txt
+	matmul_parallelfor_blas_mpi | tee output_matmul.txt
 
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/jacobi_ompss2
-cp ${STARTDIR}/MPI_Benchmarks/build/jacobi_mpi/jacobi_parallelfor_mpi .
+cp ${STARTDIR}/MPI_Benchmarks/build/jacobi_mpi/jacobi_parallelfor_nop2p_blas_mpi .
 ./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 1 \
 	jacobi_task_fetchall_blas_ompss2 \
 	jacobi_taskfor_blas_ompss2 \
-	jacobi_parallelfor_mpi | tee output_jacobi.txt
-
+	jacobi_parallelfor_nop2p_blas_mpi | tee output_jacobi.txt
 
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/cholesky_fare_ompss2
 cp ${STARTDIR}/MPI_Benchmarks/build/cholesky_mpi/cholesky_omp_mpi .

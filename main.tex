@@ -98,8 +98,8 @@ The runtime dependencies are:
 
     \item MPI library. Our communication uses Intel MPI\,2018.4 over 100\,Gb/s Intel
         OmniPath, with an HFI Silicon 100 series PCIe adaptor. To build Nanos6
-        with cluster support we require an MPI version with
-        MPI\_THREAD\_MULTIPLE support.  Intel MPI\,2018.4 can be freely
+        with cluster support we require MPI with
+        \code{MPI\_THREAD\_MULTIPLE} support.  Intel MPI\,2018.4 can be freely
         downloaded from the Intel website; but the runtime works with OpenMPI
         and MPICH as well. \footnote{The final results may strongly depend of
         the MPI multithread support and optimization; we observed degraded
@@ -245,7 +245,23 @@ Total_time: 9.47129e+07
 Algorithm_time: 7.96941e+07
 \end{lstlisting}
 
+Our repository provides a script \code{interactive\_dim.sh} to execute
+the benchmarks interactively. The script is automatically copied into
+the executable directories and its use is very simple:
+
+\begin{lstlisting}
+./interactive_dim.sh -N 1,2 -R 1 -D 32768 -B 64 -I 1 exe1 exe2 exe3
+\end{lstlisting}
+
+This will execute mpirun with -n \code{1} and \code{2} nodes (-N) for
+the executable files: \code{exe1}, \code{exe2} and
+\code{exe3}. Repeating the execution \code{3} times (-R). With a
+problem dimension of \code{32768} (-D), block size \code{64} (-B) and
+for \code{5} iterations (-I).
+
+
 \subsubsection{OmpSs benchmarks (Slurm cluster submit)}
+
 The repository also provide the scripts to submit the jobs in a
 cluster with Slurm in case your system has such a setup.
 
@@ -256,20 +272,32 @@ options that you can read directly in the file:
 For example:
 
 \begin{lstlisting}
-./submiter_dim.sh -D 32768 -B 32,64 -N 1,2,3 -I 5 -R 3 -C 24 -o results exe1 exe2 exe3
+./submiter_dim.sh -N 1,2 -R 3 -C 24 -D 32768 -B 32,64 -I 5 -o results exe1 exe2 exe3
 \end{lstlisting}
 
-This will submit 3 jobs for 1,2 and 3 nodes (-N) respectively. That
-will run the executables: \code{exe1}, \code{exe2} and \code{exe3} on
-a loop 3 times each each (-R) with 24 cores per process (-C) and will
-create a directory \code{results} (-o) to save all the outputs. With
-matrix dimension 32768 (-D), block sizes of 32 and 64 (-B) and for 5
-iterations (-I).
+This will submit 3 jobs with sbatch for \code{1} and \code{2} nodes
+(-N) respectively. That will run the executable files: \code{exe1},
+\code{exe2} and \code{exe3} with srun \code{3} times each (-R) in a
+loop with \code{24} cores per process (-C) and will create a directory
+\code{results} (-o) to save all the outputs. With a dimension of
+\code{32768} (-D), block sizes of \code{32} and \code{64} (-B) and for
+\code{5} iterations (-I).
 
-This script also creates a file inside results
+The script also creates a file inside results named
 \code{results/submit.log} with information about the submitted jobs in
 case you need to re-check them latter.
 
+\section{Step by step instructions}
 
+To partially reproduce some of the results in the paper the execution
+may require to use a big setup (up to 16 nodes and 48 cores per node
+in two numa nodes).
+
+To calculate the performance in 
 
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

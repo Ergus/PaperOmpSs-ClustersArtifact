@@ -18,7 +18,7 @@
 \usepackage{booktabs}
 
 \usepackage{listings}
-\lstset{numbers=left,numberblanklines=false,escapeinside={(*}{*)},basicstyle=\tiny,language=bash}
+\lstset{numbers=left,basicstyle=\scriptsize,language=bash}
 
 
 
@@ -127,6 +127,7 @@ dependencies and some other features.  OmpSs-2@Cluster has the same
 setup and requirements but require only MPI as an extra dependency.
 
 \begin{lstlisting}
+export STARTDIR=${PWD}
 git clone --depth 1 https://github.com/bsc-pm/nanos6-cluster
 cd nanos6-cluster
 autoreconf -vif
@@ -146,11 +147,14 @@ the default path.
 \subsection{Mercurium build and installation}
 
 \begin{lstlisting}
+cd ${STARTDIR}
 git clone --depth 1 https://github.com/bsc-pm/mcxx
 cd mcxx
 autoreconf -vif
 export MERCURIUM_HOME=/some/path2
-./configure --prefix=${MERCURIUM_HOME} --with-nanos6=${NANOS6_HOME} --enable-ompss-2
+./configure --prefix=${MERCURIUM_HOME} \
+            --with-nanos6=${NANOS6_HOME} \
+            --enable-ompss-2
 make -j install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
 cd -
@@ -166,6 +170,7 @@ not need to use mercurium.
 For the OmpSs-2@Cluster benchmarks:
 
 \begin{lstlisting}
+cd ${STARTDIR}
 git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
@@ -178,7 +183,8 @@ cd ../../
 For MPI benchmarks:
 
 \begin{lstlisting}
- git clone --depth=1 --recursive https://github.com/Ergus/MPI_Benchmarks
+cd ${STARTDIR}
+git clone --depth=1 --recursive https://github.com/Ergus/MPI_Benchmarks
 mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
 cmake --BUILD_TYPE=Release ..
@@ -216,7 +222,7 @@ To execute a benchmark in an interactive session you just need to do
 (from the build directory):
 
 \begin{lstlisting}
-cd jacobi_ompss2
+cd ${STARTDIR}/nanos-cluster-benchmarks/build/jacobi_ompss2
 mpirun -np $NP ./jacobi_task_fetchall_blas_ompss2 $DIM $BS $ITS
 \end{lstlisting}
 
@@ -224,7 +230,7 @@ Where \code{\$NP} is the number of processes to use, \code{\$DIM} the
 problem dimension, \code{\$BS} the block size and \code{\$ITS} the
 number of iterations to execute.
 
-One example execution and it output may be:
+One example execution and its output may be:
 \begin{lstlisting}
 > mpirun -np 2 ./jacobi_task_nofetch_blas_ompss2 1024 16 4
 
@@ -291,9 +297,42 @@ case you need to re-check them latter.
 
 To partially reproduce some of the results in the paper the execution
 may require to use a big setup (up to 16 nodes and 48 cores per node
-in two numa nodes).
+in two numa nodes). You can reduce the problem size (-D), the number
+of iterations (-I) and the time the experiments are repeated (-R) to
+reduce the execution time. This same commands can be used either with
+the interactive or the submit scripts.
 
-To calculate the performance in 
+\begin{lstlisting}
+cd ${STARTDIR}/nanos-cluster-benchmarks/build/matmul_matvec_ompss2
+
+cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_mpi .
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 64 -I 1 \
+	matvec_strong_flat_task_node_blas_ompss2 \
+	matvec_weak_fetchall_task_node_blas_ompss2 \
+	matvec_parallelfor_mpi | tee output_matvec.txt
+
+cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matmul_parallelfor_mpi .
+./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 64 -I 1 \
+	matmul_strong_nested_task_node_blas_ompss2 \
+	matmul_weak_fetchall_task_node_blas_ompss2 \
+	matmul_parallelfor_mpi | tee output_matmul.txt
+
+cd ${STARTDIR}/nanos-cluster-benchmarks/build/jacobi_ompss2
+cp ${STARTDIR}/MPI_Benchmarks/build/jacobi_mpi/jacobi_parallelfor_mpi .
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 64 -I 1 \
+	jacobi_task_fetchall_blas_ompss2 \
+	jacobi_taskfor_blas_ompss2 \
+	jacobi_parallelfor_mpi | tee output_jacobi.txt
+
+
+cd ${STARTDIR}/nanos-cluster-benchmarks/build/cholesky_fare_ompss2
+cp ${STARTDIR}/MPI_Benchmarks/build/cholesky_mpi/cholesky_omp_mpi .
+./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 64 -I 1 \
+	cholesky_fare_strong_ompss2 \
+	cholesky_fare_taskfor_ompss2 \
+	cholesky_omp_mpi | tee output_cholesky.txt
+
+\end{lstlisting}
 
 \end{document}
 

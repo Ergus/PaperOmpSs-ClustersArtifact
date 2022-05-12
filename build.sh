@@ -38,7 +38,7 @@ rm -rf nanos-cluster-benchmarks
 git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
-cmake --BUILD_TYPE=Release ..
+cmake --CMAKE_BUILD_TYPE=Release ..
 make
 export NANOS6_CONFIG=${PWD}/nanos6.toml
 
@@ -48,7 +48,7 @@ rm -rf MPI_Benchmarks
 git clone --depth=1 --recursive https://github.com/Ergus/MPI_Benchmarks
 mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
-cmake --BUILD_TYPE=Release ..
+cmake --CMAKE_BUILD_TYPE=Release ..
 make
 
 echo "# If you see this line installation succeeded!!"

@@ -19,6 +19,8 @@ import sys, os, re
 from statistics import mean, stdev
 import pandas as pd
 
+import matplotlib.pyplot as plt
+
 # Comments like: # Anything
 re_comment = re.compile('^#(?P<next> -+$)?(?P<report> =+$)?(?P<done> Done:  .+$)?')
 
@@ -118,32 +120,52 @@ known_complexities = {
 
 if __name__ == "__main__":
     for filename in sys.argv[1:]:
-        if os.path.isfile(filename):
-            results = {}
-            print("Processing:", filename, end=' ')
-            try:
-                with open(filename) as fin:
-                    process_file(fin)
-                print("Ok")
-            except IOError:
-                print("Couldn't read input:", filename, file = sys.stderr)
+        if not os.path.isfile(filename):
+            print("# Wrong filename: ", filename, file=stderr)
+            continue
 
-            complexity = None
+        results = {}
+        # parse file
+        print("Processing:", filename, end=' ')
+        try:
+            with open(filename) as fin:
+                process_file(fin)
+            print("Ok")
+        except IOError:
+            print("Couldn't read input:", filename, file = sys.stderr)
 
-            m = re.match(r".+_(\w+)\.txt$", filename)
-            if m and m.group(1) in known_complexities:
-                complexity = known_complexities[m.group(1)]
-            else:
-                print("Unknown experiment in file: ", filename)
-                confinue;
+        # Get experiment name
+        m = re.match(r".+_(\w+)\.txt$", filename)
+        assert(m);
+        assert(m.group(1) in known_complexities)
+        comp = known_complexities[m.group(1)]
 
-            for a in results:
-                df = pd.DataFrame(results[a],columns = ['Rows', 'Iterations', 'worldsize', 'Algorithm_time', 'Algorithm_time_stdev']).set_index('worldsize')
-                if complexity:
-                    df['performance'] = complexity(df['Rows']) * df['Iterations'] / df['Algorithm_time']
+        # Create figure
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
 
-                print(df)
+        ax.set_xlabel('Nodes')
+        ax.set_ylabel("GFLOPS")
+        ax.grid(color='b', ls = '-.', lw = 0.25)
 
-        else:
-            print("Wrong filename: ", filename)
+        # Calculate performance, error and add plot line
+        for index in results:
+            df = pd.DataFrame(results[index],
+                              columns = ['Rows', 'Iterations', 'worldsize', 'executions',
+                                         'Algorithm_time', 'Algorithm_time_stdev'])
 
+            df['Algorithm_time_err'] = df['Algorithm_time_stdev'] / df["executions"]**(1/2)
+            df['GFLOPS'] = df['Rows'].apply(comp) * df['Iterations'] / df['Algorithm_time']
+            df['GFLOPS_ERR'] = df['GFLOPS'] * df['Algorithm_time_err'] / df['Algorithm_time']
+
+            print(index)
+            print(df)
+
+            ax.errorbar(df['worldsize'], df['GFLOPS'], df['GFLOPS_ERR'],
+                        fmt='o-', linewidth=1, markersize=2, label=index)
+
+        # Save the image as a png
+        ax.legend()
+        image = os.path.basename(filename).split('.')[0] + ".png"
+        print("# Saving graph:", image)
+        fig.savefig(image, dpi=300, format='png', bbox_inches='tight')

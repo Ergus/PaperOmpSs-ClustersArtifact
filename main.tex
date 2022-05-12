@@ -137,7 +137,6 @@ export NANOS6_HOME=/some/path1
             --disable-graph-instrumentation --disable-stats-instrumentation \
             --disable-extrae-instrumentation --disable-verbose-instrumentation
 make -j install
-cd -
 \end{lstlisting}
 
 As usual the options CC=gcc CXX=g++ can be used to specify the C and
@@ -157,7 +156,6 @@ export MERCURIUM_HOME=/some/path2
             --enable-ompss-2
 make -j install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
-cd -
 \end{lstlisting}
 
 \subsection{Benchmark build and test}
@@ -177,7 +175,6 @@ cd nanos-cluster-benchmarks/build
 cmake --BUILD_TYPE=Release ..
 make
 export NANOS6_CONFIG=${PWD}/nanos6.toml
-cd ../../
 \end{lstlisting}
 
 For MPI benchmarks:

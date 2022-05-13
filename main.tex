@@ -18,7 +18,7 @@
 \usepackage{booktabs}
 
 \usepackage{listings}
-\lstset{numbers=left,basicstyle=\scriptsize,language=bash}
+\lstset{numbers=none,basicstyle=\scriptsize\ttfamily,language=bash,frame=single}
 
 \usepackage{sansmath}
 
@@ -42,6 +42,7 @@
 %   Eduard Ayguade\inst{1} \and %\orcidID{0000-0002-5146-103X} \and
 %   Jesus Labarta\inst{1} %\orcidID{0000-0002-7489-4727}
 % }
+\date{Artifact}
 %\institute{Barcelona Supercomputing Center}
 
 \maketitle
@@ -61,17 +62,23 @@ do everything?}
 
 Memory overcommitment must be enabled. On GNU/Linux, the status can be checked using:
 
-\centerline{ \code{cat /proc/sys/vm/overcommit\_memory}}
+\begin{lstlisting}
+cat /proc/sys/vm/overcommit_memory
+\end{lstlisting}
 
 If the value is not zero, it should be set to zero using:
 
-\centerline{\code{echo 0 > /proc/sys/vm/overcommit\_memory}}
+\begin{lstlisting}
+echo 0 > /proc/sys/vm/overcommit_memory
+\end{lstlisting}
 
 Address Space Layout Randomization~(ASLR) must be disabled.  The runtime is
 usually able to disable ASLR itself, if needed. But it may be necessary to
 explicitly disable ASLR using:
 
-\centerline{\code{echo 0 > /proc/sys/kernel/randomize\_va\_space}}
+\begin{lstlisting}
+echo 0 > /proc/sys/kernel/randomize_va_space
+\end{lstlisting}
 
 \subsection{Dependencies}
 
@@ -147,11 +154,10 @@ is updated with every release. To download build and install we can
 use the release
 \href{https://github.com/bsc-pm/ompss-2-cluster-releases}{2022.02}.
 
-\paul{The double hyphens look like em dashes. Maybe we need to use a different font? Some
-of the lines (here and below) extend into the margins.}
-
+\newpage
 \begin{lstlisting}
-git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
+git clone --branch 2022.02 \
+          https://github.com/bsc-pm/ompss-2-cluster-releases
 cd ompss-2-cluster-releases
 export STARTDIR=${PWD}
 git submodule init
@@ -163,9 +169,12 @@ sed -i '12i#include <cstddef>' src/memory/AddressSpace.hpp
 autoreconf -vif
 ./configure --prefix=${NANOS6_HOME} \
             --enable-cluster --enable-execution-workflow \
-            --disable-lint-instrumentation --disable-ctf-instrumentation \
-            --disable-graph-instrumentation --disable-stats-instrumentation \
-            --disable-extrae-instrumentation --disable-verbose-instrumentation
+            --disable-lint-instrumentation \
+            --disable-ctf-instrumentation \
+            --disable-graph-instrumentation \
+            --disable-stats-instrumentation \
+            --disable-extrae-instrumentation \
+            --disable-verbose-instrumentation
 make install
 \end{lstlisting}
 
@@ -182,7 +191,8 @@ echo "# Starting Mercurium installation."
 cd ${STARTDIR}/mcxx
 autoreconf -vif
 export MERCURIUM_HOME=${STARTDIR}/mcxx-install
-./configure --prefix=${MERCURIUM_HOME} --with-nanos6=${NANOS6_HOME} \
+./configure --prefix=${MERCURIUM_HOME} \
+            --with-nanos6=${NANOS6_HOME} \
             --enable-ompss-2
 make install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
@@ -200,7 +210,8 @@ For the OmpSs-2@Cluster benchmarks:
 
 \begin{lstlisting}
 cd ${STARTDIR}
-git clone --depth=1 --branch=europar https://github.com/Ergus/nanos-cluster-benchmarks
+git clone --depth=1 --branch=europar \
+          https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -212,7 +223,8 @@ For the MPI benchmarks:
 
 \begin{lstlisting}
 cd ${STARTDIR}
-git clone --depth=1 --branch=europar --recursive https://github.com/Ergus/MPI_Benchmarks
+git clone --depth=1 --branch=europar --recursive \
+          https://github.com/Ergus/MPI_Benchmarks
 mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -239,8 +251,9 @@ to check they can run in the system.
 \subsection{Running benchmarks}
 
 We provide two sets of scripts to run the benchmarks:
-\code{interactive\_dim.sh} and \code{submiter\_dim.sh}.
-\paul{Say explicitly where these scripts are.}
+\code{interactive\_dim.sh} and \code{submitter\_dim.sh}. These scripts
+are copied by cmake automatically into every benchmark build
+directory.
 
 The following instructions apply to MPI and OmpSs-2@Cluster
 benchmarks.  They are executed in the same way, the command line
@@ -312,8 +325,8 @@ script.
 \subsubsection{OmpSs benchmarks (Slurm cluster submit)}
 
 If your system uses Slurm and you are not in an interactive session,
-then you can execute \code{submiter\_dim.sh} \paul{should be submitter\_dim.sh?} instead of
-\code{interactive\_dim.sh}. 
+then you can execute \code{submitter\_dim.sh} instead of
+\code{interactive\_dim.sh}.
 
 The submit scripts accept extra command line arguments to specify
 partitions, walltime, and other Slurm-specific options. You can read
@@ -322,7 +335,7 @@ that directly in the file.
 For example:
 
 \begin{lstlisting}
-./submiter_dim.sh -N 1,2 -R 3 -C 24 -D 32768 -B 32,64 -I 5 \
+./submitter_dim.sh -N 1,2 -R 3 -C 24 -D 32768 -B 32,64 -I 5 \
 	-o results exe1 exe2 exe3
 \end{lstlisting}
 

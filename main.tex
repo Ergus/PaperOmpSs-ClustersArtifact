@@ -47,14 +47,12 @@
 
 \maketitle
 
-This artifact explains how to reproduce the results from our paper.  It
-comprises this set of instructions and a script, \code{build.sh}, which
-automates all the necessary steps. The script downloads and installs the Nanos6 runtime
-and the Mercurium source-to-source compiler. Then it downloads and runs a small
-subset of the benchmarks. \paul{If the relevant lines are uncommented, then it will run
-the complete set of benchmarks.} \paul{How much disk space is needed (very approximately) to
-do everything?}
-
+This artifact explains how to reproduce the results from our paper.
+It comprises this set of instructions and a script, \code{build.sh},
+which automates all the necessary steps. The script downloads and
+installs the Nanos6 runtime and the Mercurium source-to-source
+compiler. Then it downloads and runs a small subset of the
+benchmarks. The entire installation requires $<$2\,Gb of disk space.
 
 \section{System, Dependencies and Environment}
 
@@ -154,7 +152,6 @@ is updated with every release. To download build and install we can
 use the release
 \href{https://github.com/bsc-pm/ompss-2-cluster-releases}{2022.02}.
 
-\newpage
 \begin{lstlisting}
 git clone --branch 2022.02 \
           https://github.com/bsc-pm/ompss-2-cluster-releases

@@ -10,12 +10,13 @@ start_time=${SECONDS}
 
 echo "# Get OmpSs-2@Cluster release."
 git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
-cd ompss-2-cluster-releases
 export STARTDIR=${PWD}
+cd ompss-2-cluster-releases
 git submodule init
 git submodule update --depth 1
 
-cd ${STARTDIR}/nanos6-cluster && echo "# Starting OmpSs-2@Cluster installation."
+echo "# Starting OmpSs-2@Cluster installation."
+cd ${STARTDIR}/ompss-2-cluster-releases/nanos6-cluster
 sed -i '12i#include <cstddef>' src/memory/AddressSpace.hpp # Some compilers need this
 autoreconf -vif
 export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
@@ -23,15 +24,16 @@ export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
             --disable-lint-instrumentation --disable-ctf-instrumentation \
             --disable-graph-instrumentation --disable-stats-instrumentation \
             --disable-extrae-instrumentation --disable-verbose-instrumentation
-make install
+make -j2 install
 
-cd ${STARTDIR}/mcxx && echo "# Starting Mercurium installation." && 
+echo "# Starting Mercurium installation."
+cd ${STARTDIR}/ompss-2-cluster-releases/mcxx
 autoreconf -vif
 export MERCURIUM_HOME=${STARTDIR}/mcxx-install
 ./configure --prefix=${MERCURIUM_HOME} \
             --with-nanos6=${NANOS6_HOME} \
             --enable-ompss-2
-make install
+make -j2 install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
 
 echo "# Start nanos-cluster-benchmarks build" && cd ${STARTDIR}

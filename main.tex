@@ -20,22 +20,6 @@
 \usepackage{listings}
 \lstset{numbers=left,basicstyle=\scriptsize,language=bash}
 
-
-
-\let\origthelstnumber\thelstnumber
-
-\newcommand*\Suppressnumber{%
-  \lst@AddToHook{OnNewLine}{%
-    \let\thelstnumber\relax%
-     \advance\c@lstnumber-\@ne\relax%
-    }%
-}
-\newcommand*\Reactivatenumber{%
-  \lst@AddToHook{OnNewLine}{%
-   \let\thelstnumber\origthelstnumber%
-   \advance\c@lstnumber\@ne\relax}%
-}
-
 \usepackage{sansmath}
 
 \newcommand{\prag}[1]{\textcolor{blue}{#1}}
@@ -44,10 +28,6 @@
 \usepackage{multirow}
 
 \newcommand{\code}[1]{\texttt{#1}}
-
-% \newcolumntype{y}[1]{>{\raggedleft\hspace{0pt}}p{#1}}
-% \newcolumntype{y}{>{\raggedright }l}
-% \newcolumntype{x}[1]{>{\raggedright\hspace{0pt}}p{#1}}
 
 \begin{document}
 
@@ -71,15 +51,10 @@ source to source compiler Mercurium to create a functional setup. Then
 we need to download and build the benchmarks used in the article to
 finally execute them a process the results.
 
-The stript provided in this artifact: \code{build.sh} attempts to
+The script provided in this artifact: \code{build.sh} attempts to
 perform those actions in order.
 
 \section{System, Dependencies and Environment}
-
-We evaluate OmpSs-2@Cluster on MareNostrum\,4. Each node has two
-24-core Intel Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48
-cores per node.  Each socket has a shared 32\,MB L3 cache.  The HPL
-Rmax performance equates to 1.01\,TF per socket.
 
 In general any GNU/Linux system allowing memory over-subscription and
 disable address space randomization may work with no problem.
@@ -103,15 +78,19 @@ To build execute and create all the graphs we have these dependencies:
         version constrains between OpenMPI and hwloc. In our experiments we use
         version 1.11.8.
 
-    \item MPI library \code{MPI\_THREAD\_MULTIPLE} support. Our communication
+    \item MPI library with \code{MPI\_THREAD\_MULTIPLE} support. Our communication
         uses Intel MPI\,2018.4 over 100\,Gb/s Intel OmniPath, with an HFI Silicon
         100 series PCIe adaptor.  IMPI can be freely downloaded from the Intel
-        website; but the runtime works with OpenMPI and MPICH as well.
+        website \href{https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html}{IMPI};
+        but the runtime works with OpenMPI and MPICH as well.
         \footnote{The final results may strongly depend of the MPI multithread
         support and optimization; we observed degraded performance results
         when using OpenMPI.}
 
     \item cmake >= 3.10 and Blas/Lapack: to build the optimized benchmarks.
+        We use Intel MKL in our experiments. It can be freely
+        downloaded from the intel web site:
+        \href{https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html}{oneMKL}
 
     \item python3, matplotlib and pandas: to process the outputs and generate the graphics.
 
@@ -333,6 +312,15 @@ The script also creates a file inside results named
 case you need to re-check them latter.
 
 \section{Step by step instructions}
+
+We evaluate OmpSs-2@Cluster on
+MareNostrum\,4~\cite{MareNostrum4}. Each node has two 24-core Intel
+Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48 cores per
+node.  Each socket has a shared 32\,MB L3 cache.  The HPL Rmax
+performance equates to 1.01\,TF per socket.  Communication uses Intel
+MPI\,2018.4 over 100\,Gb/s Intel OmniPath, with an HFI Silicon 100
+series PCIe adaptor.  All the kernels use the same code and same
+standard BLAS functions from Intel MKL\,2018.4.
 
 To partially reproduce some of the results in the paper, the execution
 may require a big setup (up to 16 nodes and 48 cores per node in two

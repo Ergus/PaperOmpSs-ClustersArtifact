@@ -15,9 +15,7 @@
 
 SHELL:=bash
 
-all: main.pdf
-
-main.pdf: $(wildcard *.tex)
+all: Overview.pdf
 
 %.pdf: %.tex
 	latexmk -f -pdf -pdflatex="pdflatex -interaction=nonstopmode -file-line-error -synctex=1" -use-make $<

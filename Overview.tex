@@ -42,7 +42,7 @@
 \maketitle
 
 This artifact explains how to reproduce the results from our paper.
-It comprises this set of instructions and a script, \code{build.sh},
+It comprises this set of instructions and a script, \code{artifact.sh},
 which automates all the necessary steps. The script downloads and
 installs the Nanos6 runtime and the Mercurium source-to-source
 compiler. Then it downloads and runs a small subset of the
@@ -114,7 +114,7 @@ The software dependencies are:
 
 \subsection{Automated approach using the script}
 
-We provide the script \code{build.sh} to automatize the steps
+We provide the script \code{artifact.sh} to automatize the steps
 explained in this section. To run it you need an interactive session
 with internet access (to clone the repositories) where mpi can run at
 least on two nodes because this is a scalability experiment. For more
@@ -232,7 +232,7 @@ The following instructions apply to MPI and OmpSs-2@Cluster
 benchmarks.  They are executed in the same way, the command line
 arguments, outputs and submission scripts are the same.
 
-The script \code{build.sh} tries to execute using
+The script \code{artifact.sh} tries to execute using
 \code{interactive\_dim.sh}.
 
 \subsubsection{OmpSs benchmarks (interactively)}\label{INTERACTIVE}
@@ -326,7 +326,7 @@ case you need to re-check them latter.
 
 \section{Step by step instructions}\label{SBS}
 
-The script \code{build.sh} builds and downloads everything in the
+The script \code{artifact.sh} builds and downloads everything in the
 caller directory (\code{cwd}). And it creates a new file
 \code{nanos6\_automatic\_build.log} that can be used to diagnose
 issues.
@@ -340,8 +340,8 @@ minutes. The benchmarks execution time depends of the problem size
 (-D), Iterations (-I) and executions (-R).
 
 \begin{lstlisting}
-chmod a+x build.sh
-./build.sh
+chmod a+x artifact.sh
+./artifact.sh
 \end{lstlisting}
 
 It will try to download the libraries, and benchmark, build them with
@@ -404,7 +404,7 @@ outputs: \code{output\_<benchmark>.txt}.
 
 To process these files and get equivalent strong scalability than the
 Fig\,5 in the paper we provide a Python script to process the output,
-calculate the FLOPS and generate the plots (\code{build.sh} tries to
+calculate the FLOPS and generate the plots (\code{artifact.sh} tries to
 call it directly):
 
 \begin{lstlisting}

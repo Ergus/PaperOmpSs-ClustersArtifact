@@ -9,7 +9,7 @@ auto/
 *.ist
 *.log
 *.out
-main.pdf
+*.pdf
 *.run.xml
 *.synctex.gz
 *.toc
@@ -25,3 +25,4 @@ _region_.tex
 *.prv
 *.pcf
 *.row
+*.zip

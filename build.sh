@@ -52,7 +52,7 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make # Don't add -j here
 
 echo "# If you see this line installation succeeded!!"
-echo "# Build time $((end_time - SECONDS)) seconds"
+echo "# Build time $((SECONDS - start_time)) seconds"
 echo "# Please to run the benchmarks remember to export the following variables:"
 echo "# NANOS6_HOME=${NANOS6_HOME}"
 echo "# NANOS6_CONFIG=${NANOS6_CONFIG}"
@@ -94,4 +94,4 @@ cd ${STARTDIR}
 ./process_dim.py output_*.txt
 
 echo "# If you see this line also the output graphs were generated."
-echo "# Elapsed $((end_time - SECONDS)) seconds"
+echo "# Elapsed $((SECONDS - start_time)) seconds"

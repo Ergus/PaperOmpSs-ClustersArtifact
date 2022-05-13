@@ -138,9 +138,10 @@ git submodule update --depth 1
 
 export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
 cd ${STARTDIR}/nanos6-cluster
-sed -i '12i#include <cstddef>' src/memory/AddressSpace.hpp # Some compilers need this
+sed -i '12i#include <cstddef>' src/memory/AddressSpace.hpp
 autoreconf -vif
-./configure --enable-cluster --enable-execution-workflow --prefix=${NANOS6_HOME} \
+./configure --prefix=${NANOS6_HOME} \
+            --enable-cluster --enable-execution-workflow \
             --disable-lint-instrumentation --disable-ctf-instrumentation \
             --disable-graph-instrumentation --disable-stats-instrumentation \
             --disable-extrae-instrumentation --disable-verbose-instrumentation
@@ -160,8 +161,7 @@ echo "# Starting Mercurium installation."
 cd ${STARTDIR}/mcxx
 autoreconf -vif
 export MERCURIUM_HOME=${STARTDIR}/mcxx-install
-./configure --prefix=${MERCURIUM_HOME} \
-            --with-nanos6=${NANOS6_HOME} \
+./configure --prefix=${MERCURIUM_HOME} --with-nanos6=${NANOS6_HOME} \
             --enable-ompss-2
 make install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
@@ -179,7 +179,7 @@ For the OmpSs-2@Cluster benchmarks:
 
 \begin{lstlisting}
 cd ${STARTDIR}
-git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
+git clone --depth=1 --branch=europar https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -191,7 +191,7 @@ For the MPI benchmarks:
 
 \begin{lstlisting}
 cd ${STARTDIR}
-git clone --depth=1 --recursive https://github.com/Ergus/MPI_Benchmarks
+git clone --depth=1 --branch=europar --recursive https://github.com/Ergus/MPI_Benchmarks
 mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..

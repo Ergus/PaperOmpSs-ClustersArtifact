@@ -23,6 +23,7 @@
 \usepackage{sansmath}
 
 \newcommand{\prag}[1]{\textcolor{blue}{#1}}
+\newcommand{\paul}[1]{\textcolor{purple}{#1}}
 
 \usepackage[T1]{fontenc}
 \usepackage{multirow}
@@ -45,54 +46,64 @@
 
 \maketitle
 
-This paper it about features implemented in OmpSs-2@Cluster, so the
-first step to reproduce the results is to install Nanos6 and the
-source to source compiler Mercurium to create a functional setup. Then
-we need to download and build the benchmarks used in the article to
-finally execute them a process the results.
-
-The script provided in this artifact: \code{build.sh} attempts to
-perform those actions in order.
+This artifact explains how to reproduce the results from our paper.  It
+comprises this set of instructions and a script, \code{build.sh}, which
+automates all the necessary steps. The script downloads and installs the Nanos6 runtime
+and the Mercurium source-to-source compiler. Then it downloads and runs a small
+subset of the benchmarks. \paul{If the relevant lines are uncommented, then it will run
+the complete set of benchmarks.}
 
 \section{System, Dependencies and Environment}
 
-In general any GNU/Linux system allowing memory over-subscription and
-disable address space randomization may work with no problem.
+\subsection{System}
 
-To build execute and create all the graphs we have these dependencies:
+Memory overcommitment must be enabled. On GNU/Linux, the status can be checked using:
+
+\centerline{ \code{cat /proc/sys/vm/overcommit\_memory}}
+
+If the value is not zero, it should be set to zero using:
+
+\centerline{\code{echo 0 > /proc/sys/vm/overcommit\_memory}}
+
+Address Space Layout Randomization~(ASLR) must be disabled.  The runtime is
+usually able to disable ASLR itself, if needed. But it may be necessary to
+explicitly disable ASLR using:
+
+\centerline{\code{echo 0 > /proc/sys/kernel/randomize\_va\_space}}
+
+\subsection{Dependencies}
+
+The software dependencies are:
 
 \begin{enumerate}
     \item automake, autoconf, libtool, pkg-config and make.
 
-    \item C and C++ compiler: to build the nanos6, Mercurium and the benchmarks;
-        we have tested gcc\,7.2.0 and icpc\,2018.1 and they both work without
-        issues.
-        \footnote{To build the tests Mercurium provides different executables;
+    \item C and C++ compiler:  gcc\,7.2.0 and icpc\,2018.1 are known to work without
+        issues.\footnote{To build the tests Mercurium provides different executables;
         in order to use gcc/g++ (mcc/mcxx) or icc (imc/imcxx).}
 
-    \item bison, gperf, libsqlite3 and flex: to build mercurium
+    \item bison, gperf, libsqlite3 and flex.
 
     \item boost >= 1.59: In our experiments we use boost\,1.64.0.
 
     \item hwloc: If you use OpenMPI then it will be a dependency as there are some
-        version constrains between OpenMPI and hwloc. In our experiments we use
-        version 1.11.8.
+        version constraints between OpenMPI and hwloc. In our experiments we use
+        hwloc 1.11.8.
 
     \item MPI library with \code{MPI\_THREAD\_MULTIPLE} support. Our communication
         uses Intel MPI\,2018.4 over 100\,Gb/s Intel OmniPath, with an HFI Silicon
         100 series PCIe adaptor.  IMPI can be freely downloaded from the Intel
         website \href{https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html}{IMPI};
-        but the runtime works with OpenMPI and MPICH as well.
-        \footnote{The final results may strongly depend of the MPI multithread
+        but the runtime also works with OpenMPI and MPICH.\footnote{The final results may strongly depend of the MPI multithreaded
         support and optimization; we observed degraded performance results
         when using OpenMPI.}
 
-    \item cmake >= 3.10 and Blas/Lapack: to build the optimized benchmarks.
+    \item cmake >= 3.10 and BLAS/LAPACK: to build the optimized benchmarks.
         We use Intel MKL in our experiments. It can be freely
-        downloaded from the intel web site:
+        downloaded from the Intel web site:
         \href{https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html}{oneMKL}
 
-    \item python3, matplotlib and pandas: to process the outputs and generate the graphics.
+    \item python3, matplotlib and pandas: to process the outputs and generate the plots.
 
 \end{enumerate}
 
@@ -102,18 +113,18 @@ We provide the script \code{build.sh} to automatize the steps
 explained in this section.
 
 The script contains the same problem sizes and number of
-iterations used in the document. Such executions make take several
-hours to complete all the experiments, specially in smaller
+iterations used in the document. Such executions may take several
+hours to complete all the experiments, especially on smaller
 systems. For quick tests we recommend to divide by 4 every problem
-size (-D) and reduce the number of executions (-R) to 1-3.
+size (-D) and reduce the number of executions (-R) to between 1 and 3.
 
 The script \code{build.sh} builds and downloads everything in the
-caller directory (\code{cwd}). And creates a new file
-\code{nanos6\_automatic\_build.log} that we can used to check and
-solve issues.
+caller directory (\code{cwd}). And it creates a new file
+\code{nanos6\_automatic\_build.log} that can be used to diagnose
+issues.
 
 The outputs are added in the same directory in different files that we
-can process individually with the provided python script
+can process individually with the provided Python script
 \code{process\_dim.py}.
 
 The full download, build and installation may take about 30
@@ -124,7 +135,7 @@ minutes. The benchmarks execution time depends of the problem size
 
 The nanos6 basic installation instructions are on:
 \href{https://github.com/bsc-pm/nanos6-cluster}{nanos6-cluster} the
-readme file explains the dependencies and some other features and it
+README.md file explains the dependencies and some other features and it
 is updated with every release. To download build and install we can
 use the release
 \href{https://github.com/bsc-pm/ompss-2-cluster-releases}{2022.02}.
@@ -152,7 +163,7 @@ As usual the options CC=gcc CXX=g++ can be used to specify the C and
 C++ compilers --with-boost= to specify BOOST path in case it is not in
 the default path.
 
-The compiler for mercurium is on:
+The compiler for Mercurium is on:
 \href{https://github.com/bsc-pm/mcxx}{mcxx}. To build it we need the
 following steps.
 
@@ -170,9 +181,9 @@ export PATH=${MERCURIUM_HOME}/bin:${PATH}
 \subsection{Benchmark build and test}
 
 The MPI benchmarks are in different repositories so we need to build
-them appart. This is a requirement because cmake does not allow to use
+them separately. This is a requirement because cmake does not allow to use
 different compilers in the same project; and the MPI benchmarks does
-not need to use mercurium; but be careful to build both with the same
+not need to use Mercurium; but be careful to build both with the same
 compiler to get consistent results.
 
 For the OmpSs-2@Cluster benchmarks:
@@ -202,7 +213,7 @@ By default cmake will try to use the gcc compiler; to use icc it is
 possible to pass the option \code{-DCCOMPILER=intel} in the cmake
 line.
 
-By default cmake will try to build with the system's Lapack library
+By default cmake will try to build with the system's LAPACK library
 following the cmake policy to find it:
 \href{https://cmake.org/cmake/help/latest/module/FindLAPACK.html}{FindLAPACK}
 \href{https://cmake.org/cmake/help/latest/module/FindBLAS.html}{FindBLAS}
@@ -266,7 +277,7 @@ Algorithm_time: 7.96941e+07
 If you see a duplicated output it means that the cluster mode was not
 properly set in nanos6, so probably you are setting a wrong value for
 \code{NANOS6\_CONFIG} or the options \code{--enable-cluster} and
-\code{--enable-execution-workflow} where missing when configuring the
+\code{--enable-execution-workflow} were missing when configuring the
 OmpSs-2@Cluster runtime library nanos6.
 
 The script \code{interactive\_dim.sh} to execute multiple benchmarks
@@ -283,24 +294,25 @@ the executable files: \code{exe1}, \code{exe2} and
 problem dimension of \code{32768} (-D), block size \code{64} (-B) and
 for \code{5} iterations (-I).
 
-If you are in a slurm system with an interactive session you could
+If you are in a Slurm system with an interactive session you could
 consider to substitute \code{mpirun} with \code{srun} inside the
 script.
 
 \subsubsection{OmpSs benchmarks (Slurm cluster submit)}
 
-If your system uses slurm and you are not in an interactive session,
-then you can use a \code{submiter\_dim.sh} in the same way than
+If your system uses Slurm and you are not in an interactive session,
+then you can execute \code{submiter\_dim.sh} \paul{should be submitter\_dim.sh?} instead of
 \code{interactive\_dim.sh}. 
 
-The submit scripts accepts extra command line arguments to specify
-partitions, walltime, and other slurm specific options. You can read
+The submit scripts accept extra command line arguments to specify
+partitions, walltime, and other Slurm-specific options. You can read
 that directly in the file.
 
 For example:
 
 \begin{lstlisting}
-./submiter_dim.sh -N 1,2 -R 3 -C 24 -D 32768 -B 32,64 -I 5 -o results exe1 exe2 exe3
+./submiter_dim.sh -N 1,2 -R 3 -C 24 -D 32768 -B 32,64 -I 5 \
+	-o results exe1 exe2 exe3
 \end{lstlisting}
 
 This will submit 3 jobs with sbatch for \code{1} and \code{2} nodes
@@ -328,14 +340,14 @@ standard BLAS functions from Intel MKL\,2018.4.
 
 To partially reproduce some of the results in the paper, the execution
 may require a big setup (up to 16 nodes and 48 cores per node in two
-numa nodes and enough ram to allocate the matrices). You can reduce
+NUMA nodes and enough RAM to allocate the matrices). You can reduce
 the problem size (-D), the number of iterations (-I) and the time the
 experiments are repeated (-R) to reduce the execution time. This
 similar commands can be used either with the interactive or the submit
 scripts.
 
 To execute a quick test you could reduce the problem size (-D)
-dividing the provided values bellow by 4 and reduce the number of
+dividing the provided values below by 4 and reduce the number of
 executions (-R) to 1 or 3 and the iterations to 1 or 2. \footnote{In
   cholesky the -I parameter needs to be always zero.}
 
@@ -374,7 +386,7 @@ results: \code{output\_matvec.txt}, \code{output\_matmul.txt}
 \code{output\_jacobi.txt} and \code{output\_cholesky.txt}.
 
 To process these files and get equivalent strong scalability than the
-Fig\,5 in the paper we provide a python script to process the output,
+Fig\,5 in the paper we provide a Python script to process the output,
 calculate the FLOPS and generate the plots:
 
 \begin{lstlisting}
@@ -382,8 +394,8 @@ cd ${STARTDIR}
 ./process_dim.py output_*.txt
 \end{lstlisting}
 
-The script will create a plot with the same basename, but with png
-extension. And will print the numeric results to stdout.
+The script will create a plot with the same basename, but with a png
+extension. It will also print the numeric results to stdout.
 
 \end{document}
 

@@ -34,14 +34,8 @@
 
 \title{OmpSs-2@Cluster: Distributed memory execution of nested OpenMP-style tasks}
 
-% \author{
-%   Jimmy Aguilar Mena\inst{1} \and %\orcidID{0000-0001-6802-2247} \and
-%   Omar Shaaban\inst{1} \and %\ordicID{0000-0003-4410-5317} \and
-%   Vicen\c{c} Beltran\inst{1} \and %\orcidID{0000-0002-3580-9630} \and
-%   Paul Carpenter\inst{1} \and %\orcidID{0000-0002-9392-0521} \and
-%   Eduard Ayguade\inst{1} \and %\orcidID{0000-0002-5146-103X} \and
-%   Jesus Labarta\inst{1} %\orcidID{0000-0002-7489-4727}
-% }
+\author{Jimmy Aguilar Mena, Omar Shaaban, Vicen\c{c} Beltran,\\
+  Paul Carpenter, Eduard Ayguade, Jesus Labarta}
 \date{Artifact}
 %\institute{Barcelona Supercomputing Center}
 
@@ -58,7 +52,8 @@ benchmarks. The entire installation requires $<$2\,Gb of disk space.
 
 \subsection{System}
 
-Memory overcommitment must be enabled. On GNU/Linux, the status can be checked using:
+Memory overcommitment must be enabled. On GNU/Linux, the status can be
+checked using:
 
 \begin{lstlisting}
 cat /proc/sys/vm/overcommit_memory
@@ -70,9 +65,10 @@ If the value is not zero, it should be set to zero using:
 echo 0 > /proc/sys/vm/overcommit_memory
 \end{lstlisting}
 
-Address Space Layout Randomization~(ASLR) must be disabled.  The runtime is
-usually able to disable ASLR itself, if needed. But it may be necessary to
-explicitly disable ASLR using:
+Address Space Layout Randomization~(ASLR) must be disabled.  The
+runtime is usually able to disable ASLR itself, if needed. But some
+systems restrict some users to do so, if that's tour case it may be
+necessary to explicitly disable ASLR using:
 
 \begin{lstlisting}
 echo 0 > /proc/sys/kernel/randomize_va_space
@@ -119,16 +115,10 @@ The software dependencies are:
 \subsection{Automated approach using the script}
 
 We provide the script \code{build.sh} to automatize the steps
-explained in this section. \paul{Where do you need to run it? 
-I suppose you need an interactive session where srun can execute
-across at least N nodes.}
-
-The script contains the same problem sizes and number of
-iterations used in the document. Such executions may take several
-hours to complete all the experiments, especially on smaller
-systems. For quick tests we recommend to divide by 4 every problem
-size (-D) and reduce the number of executions (-R) to between 1 and 3.
-\paul{How many nodes does it use? It it the same as in the document.}
+explained in this section. To run it you need an interactive session
+with internet access (to clone the repositories) where mpi can run at
+least on two nodes because this is a scalability experiment. For more
+details see section\,\ref{SBS}.
 
 The script \code{build.sh} builds and downloads everything in the
 caller directory (\code{cwd}). And it creates a new file
@@ -147,11 +137,12 @@ minutes. The benchmarks execution time depends of the problem size
 
 The nanos6 basic installation instructions are on:
 \href{https://github.com/bsc-pm/nanos6-cluster}{nanos6-cluster} the
-README.md file explains the dependencies and some other features and it
-is updated with every release. To download build and install we can
+README.md file explains the dependencies and some other features and
+it is updated with every release. To download build and install we can
 use the release
 \href{https://github.com/bsc-pm/ompss-2-cluster-releases}{2022.02}.
 
+\newpage
 \begin{lstlisting}
 git clone --branch 2022.02 \
           https://github.com/bsc-pm/ompss-2-cluster-releases
@@ -259,7 +250,7 @@ arguments, outputs and submission scripts are the same.
 The script \code{build.sh} tries to execute using
 \code{interactive.sh}.
 
-\subsubsection{OmpSs benchmarks (interactively)}
+\subsubsection{OmpSs benchmarks (interactively)}\label{INTERACTIVE}
 To execute a benchmark in an interactive session you just need to go
 to the build directory and execute it as a normal MPI aplication, the
 OmpSs-2@Cluster runtime relies on your MPI to distribute the processes
@@ -319,7 +310,7 @@ If you are in a Slurm system with an interactive session you could
 consider to substitute \code{mpirun} with \code{srun} inside the
 script.
 
-\subsubsection{OmpSs benchmarks (Slurm cluster submit)}
+\subsubsection{OmpSs benchmarks (Slurm cluster submit)}\label{SUBMIT}
 
 If your system uses Slurm and you are not in an interactive session,
 then you can execute \code{submitter\_dim.sh} instead of
@@ -348,69 +339,80 @@ The script also creates a file inside results named
 \code{results/submit.log} with information about the submitted jobs in
 case you need to re-check them latter.
 
-\section{Step by step instructions}
-\paul{I don't understand the relationship between this section and the earlier one '`Running benchmarks''. This also seems
-to be the instructions to run the benchmarks.}
+\section{Step by step instructions}\label{SBS}
 
-We evaluate OmpSs-2@Cluster on
-MareNostrum\,4~\cite{MareNostrum4} \paul{Missing citation}. Each node has two 24-core Intel
-Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48 cores per
-node.  Each socket has a shared 32\,MB L3 cache.  The HPL Rmax
-performance equates to 1.01\,TF per socket.  Communication uses Intel
-MPI\,2018.4 over 100\,Gb/s Intel OmniPath, with an HFI Silicon 100
-series PCIe adaptor.  All the kernels use the same code and same
+To run everything automatically you could try the provided
+script. First you copy it to a desired place and then:
+
+\begin{lstlisting}
+chmod a+x build.sh
+./build.sh
+\end{lstlisting}
+
+It will try to download the libraries, and benchmark, build them,
+execute and create the plots. The current sizes are very big for
+simple quick tests, so reduce them as explained bellow.
+
+We evaluate OmpSs-2@Cluster on MareNostrum\,4. Each node has two
+24-core Intel Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48
+cores per node.  Each socket has a shared 32\,MB L3 cache.  The HPL
+Rmax performance equates to 1.01\,TF per socket.  Communication uses
+Intel MPI\,2018.4 over 100\,Gb/s Intel OmniPath, with an HFI Silicon
+100 series PCIe adaptor.  All the kernels use the same code and same
 standard BLAS functions from Intel MKL\,2018.4.
 
-To partially reproduce some of the results in the paper, the execution
-may require a big setup (up to 16 nodes and 48 cores per node in two
-NUMA nodes and enough RAM to allocate the matrices). You can reduce
-the problem size (-D), the number of iterations (-I) and the time the
-experiments are repeated (-R) to reduce the execution time. This
-similar commands can be used either with the interactive or the submit
-scripts.
+The current number of nodes to run the benchmarks is 1 and 2 (-N
+1,2). If you want to run in more nodes you need to change them in the
+scrips.
 
-To execute a quick test you could reduce the problem size (-D)
-dividing the provided values below by 4 and reduce the number of
-executions (-R) to 1 or 3 and the iterations to 1 or 2. \footnote{In
-  cholesky the -I parameter needs to be always zero.}
+The script contains the same problem sizes and number of iterations
+used in the paper. Such executions may take several hours to complete
+all the experiments, especially on smaller systems. For quick tests we
+recommend to divide by 4 every problem size (-D) and block sizes (-B);
+but also reduce the number of executions (-R) and iterations (-I) to 1
+or 3. For simplicity the code demands that -D may be divisible by all
+-N values and -B. The same command line options can be used either
+with the interactive (\ref{INTERACTIVE}) or the submit \ref{SUBMIT}
+scripts.
 
 \begin{lstlisting}
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/matmul_matvec_ompss2
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 5 \
+./interactive_dim.sh -N 1,2 -R 3 -D $((16*1024)) -B 64 -I 3 \
 	matvec_strong_flat_task_node_blas_ompss2 \
 	matvec_weak_fetchall_task_node_blas_ompss2 \
 	matvec_parallelfor_blas_mpi | tee ${STARTDIR}/output_matvec.txt
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matmul_parallelfor_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 16 -I 1 \
+./interactive_dim.sh -N 1,2 -R 3 -D $((4*1024)) -B 8 -I 1 \
 	matmul_strong_nested_task_node_blas_ompss2 \
 	matmul_weak_fetchall_task_node_blas_ompss2 \
 	matmul_parallelfor_blas_mpi | tee ${STARTDIR}/output_matmul.txt
 
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/jacobi_ompss2
 cp ${STARTDIR}/MPI_Benchmarks/build/jacobi_mpi/jacobi_parallelfor_nop2p_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 5 \
+./interactive_dim.sh -N 1,2 -R 3 -D $((16*1024)) -B 256 -I 3 \
 	jacobi_task_fetchall_blas_ompss2 \
 	jacobi_taskfor_blas_ompss2 \
 	jacobi_parallelfor_nop2p_blas_mpi | tee ${STARTDIR}/output_jacobi.txt
 
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/cholesky_fare_ompss2
 cp ${STARTDIR}/MPI_Benchmarks/build/cholesky_mpi/cholesky_omp_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 512 -I 0 \
+./interactive_dim.sh -N 1,2 -R 3 -D $((16*1024)) -B 128 -I 0 \
 	cholesky_fare_strong_ompss2 \
 	cholesky_fare_taskfor_ompss2 \
 	cholesky_omp_mpi | tee ${STARTDIR}/output_cholesky.txt
 \end{lstlisting}
 
-The previous lines should produce 4 output files with the numeric
-results: \code{output\_matvec.txt}, \code{output\_matmul.txt}
+The previous lines should produce 4 output files with the benchmarks
+outputs: \code{output\_matvec.txt}, \code{output\_matmul.txt}
 \code{output\_jacobi.txt} and \code{output\_cholesky.txt}.
 
 To process these files and get equivalent strong scalability than the
 Fig\,5 in the paper we provide a Python script to process the output,
-calculate the FLOPS and generate the plots:
+calculate the FLOPS and generate the plots (\code{build.sh} tries to
+call it directly):
 
 \begin{lstlisting}
 cd ${STARTDIR}

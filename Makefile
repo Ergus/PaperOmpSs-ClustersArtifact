@@ -20,11 +20,14 @@ all: Overview.pdf
 %.pdf: %.tex
 	latexmk -f -pdf -pdflatex="pdflatex -interaction=nonstopmode -file-line-error -synctex=1" -use-make $<
 
+artifact.zip: Overview.pdf artifact.sh process_dim.py
+	zip $@ $^
+
 .PHONY: clean show
 
 clean:
 	latexmk -CA
-	rm -rf *.{ps,pdf,log,aux,out,dvi,bbl,blg,ist,glsdefs,gls,glo,glg,xdy,synctex.gz,toc,bcf,xml,nav,snm,fls,fdb_latexmk} auto _region_.tex
+	rm -rf *.{zip,ps,pdf,log,aux,out,dvi,bbl,blg,ist,glsdefs,gls,glo,glg,xdy,synctex.gz,toc,bcf,xml,nav,snm,fls,fdb_latexmk} auto _region_.tex
 
 show: main.pdf
 	xdg-open $< &

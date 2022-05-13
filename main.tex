@@ -125,15 +125,18 @@ smaller systems. For quick tests we recommend to divide by 4 every
 problem size (-D) and reduce the number of executions (-R) to
 1-3.\footnote{In cholesky the -I parameter needs to be always zero.}
 
-The script build.sh builds and downloads everything in the caller
-directory (cwd). And creates a new file
+The script \code{build.sh} builds and downloads everything in the
+caller directory (cwd). And creates a new file
 \code{nanos6\_automatic\_build.log} that we can use to check and solve
 issues.
 
 The outputs are added in the same directory in different files that we
-can process latter with the python script \code{process\_dim.py}.
+can process individually latter with the python script
+\code{process\_dim.py}.
 
-The full download, build and installation may take about 30 minutes. 
+The full download, build and installation may take about 30
+minutes. The benchmarks execution time depends if the problem size
+(-D), Iterations (-I) and executions (-R).
 
 \subsection{Nanos6 and Mercurium build and installation}
 
@@ -190,7 +193,7 @@ mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
-export NANOS6_CONFIG=${STARTDIR}/nanos6.toml
+export NANOS6_CONFIG=${STARTDIR}/nanos-cluster-benchmarks/build/nanos6.toml
 \end{lstlisting}
 
 For the MPI benchmarks:
@@ -226,7 +229,7 @@ We provide two sets of scripts to run the benchmarks:
 
 The following instructions apply to MPI and OmpSs-2@Cluster
 benchmarks.  They are executed in the same way, the command line
-arguments, outputs and submission scripts are all similes.
+arguments, outputs and submission scripts are the same.
 
 \subsubsection{OmpSs benchmarks (interactively)}
 To execute a benchmark in an interactive session you just need to go
@@ -264,10 +267,13 @@ Total_time: 9.47129e+07
 Algorithm_time: 7.96941e+07
 \end{lstlisting}
 
-If you see the output duplicated it means that the cluster mode was
-not properly set, so probably you are setting a wrong value for \code{NANOS6\_CONFIG}.
+If you see a duplicated output it means that the cluster mode was not
+properly set in nanos6, so probably you are setting a wrong value for
+\code{NANOS6\_CONFIG} or the options \code{--enable-cluster} and
+\code{--enable-execution-workflow} were not added to configure the
+OmpSs-2@Cluster runtime nanos6.
 
-The benchmark repository provides a script \code{interactive\_dim.sh}
+The benchmark repository provides the script \code{interactive\_dim.sh}
 to execute multiple benchmarks interactively. The script is
 automatically copied into the build directories and its use is very
 simple:
@@ -312,12 +318,17 @@ case you need to re-check them latter.
 
 \section{Step by step instructions}
 
-To partially reproduce some of the results in the paper the execution
-may require to use a big setup (up to 16 nodes and 48 cores per node
-in two numa nodes). You can reduce the problem size (-D), the number
-of iterations (-I) and the time the experiments are repeated (-R) to
-reduce the execution time. This similar commands can be used either
-with the interactive or the submit scripts.
+To partially reproduce some of the results in the paper, the execution
+may require a big setup (up to 16 nodes and 48 cores per node in two
+numa nodes and enough ram to allocate the matrices). You can reduce
+the problem size (-D), the number of iterations (-I) and the time the
+experiments are repeated (-R) to reduce the execution time. This
+similar commands can be used either with the interactive or the submit
+scripts.
+
+To execute a quick test you could reduce the problem size (-D) divide
+the provided values bellow by 4 and reduce the number of executions
+(-R) to 1 or 3.
 
 \begin{lstlisting}
 cd ${STARTDIR}/nanos-cluster-benchmarks/build/matmul_matvec_ompss2
@@ -329,7 +340,7 @@ cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_blas_mp
 	matvec_parallelfor_blas_mpi | tee ${STARTDIR}/output_matvec.txt
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matmul_parallelfor_blas_mpi .
-./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 16 -I 5 \
+./interactive_dim.sh -N 1,2 -R 10 -D 16384 -B 16 -I 1 \
 	matmul_strong_nested_task_node_blas_ompss2 \
 	matmul_weak_fetchall_task_node_blas_ompss2 \
 	matmul_parallelfor_blas_mpi | tee ${STARTDIR}/output_matmul.txt
@@ -355,14 +366,16 @@ The previous lines should produce 4 output files with the numeric
 results: \code{output\_matvec.txt}, \code{output\_matmul.txt}
 \code{output\_jacobi.txt} and \code{output\_cholesky.txt}.
 
-To process these files there is a python script:
+To process these files and get equivalent strong scalability than the
+Fig\,5 in the paper we provide a python script to process the output,
+calculate the FLOPS and generate the plots:
 
 \begin{lstlisting}
 ./process_dim.py output_matvec.txt output_matmul.txt output_jacobi.txt output_cholesky.txt
 \end{lstlisting}
 
 The script will create a plot with the same basename, but with png
-extension. And will print the processed results to stdout.
+extension. And will print the numeric results to stdout.
 
 \end{document}
 

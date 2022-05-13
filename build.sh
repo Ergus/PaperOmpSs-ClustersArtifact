@@ -6,11 +6,14 @@ set -e
 # Redirect all the outputs to the logfile
 exec &> >(tee -a "nanos6_automatic_build.log")
 
-echo "# Starting OmpSs-2@Cluster installation."
+echo "# Get OmpSs-2@Cluster release."
+git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
+cd ompss-2-cluster-releases
 export STARTDIR=${PWD}
-rm -rf nanos6-cluster
-git clone --depth 1 https://github.com/bsc-pm/nanos6-cluster
-cd nanos6-cluster
+git submodule init
+git submodule update --depth 1
+
+cd ${STARTDIR}/nanos6-cluster && echo "# Starting OmpSs-2@Cluster installation."
 sed -i '12i#include <cstddef>' src/memory/AddressSpace.hpp # Some compilers need this
 autoreconf -vif
 export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
@@ -20,11 +23,7 @@ export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
             --disable-extrae-instrumentation --disable-verbose-instrumentation
 make install
 
-echo "# Starting Mercurium installation."
-cd ${STARTDIR}
-rm -rf mcxx
-git clone --depth 1 https://github.com/bsc-pm/mcxx
-cd mcxx
+cd ${STARTDIR}/mcxx && echo "# Starting Mercurium installation." && 
 autoreconf -vif
 export MERCURIUM_HOME=${STARTDIR}/mcxx-install
 ./configure --prefix=${MERCURIUM_HOME} \
@@ -33,20 +32,16 @@ export MERCURIUM_HOME=${STARTDIR}/mcxx-install
 make install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
 
-echo "# Start nanos-cluster-benchmarks build"
-cd ${STARTDIR}
-rm -rf nanos-cluster-benchmarks
-git clone --depth=1 https://github.com/Ergus/nanos-cluster-benchmarks
+echo "# Start nanos-cluster-benchmarks build" && cd ${STARTDIR}
+git clone --depth=1  --branch=europar https://github.com/Ergus/nanos-cluster-benchmarks
 mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make # Don't add -j here
 export NANOS6_CONFIG=${STARTDIR}/nanos6.toml
 
-echo "# Start mpi-benchmarks build"
-cd ${STARTDIR}
-rm -rf MPI_Benchmarks
-git clone --depth=1 --recursive https://github.com/Ergus/MPI_Benchmarks
+echo "# Start mpi-benchmarks build" && cd ${STARTDIR}
+git clone --depth=1 --branch=europar --recursive https://github.com/Ergus/MPI_Benchmarks
 mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -58,8 +53,8 @@ echo "# NANOS6_HOME=${NANOS6_HOME}"
 echo "# NANOS6_CONFIG=${NANOS6_CONFIG}"
 echo "# And your PATH must contain ${MERCURIUM_HOME}/bin in order to use the mercurium compiler"
 
-echo "Start running a benchmark subset."
-cd ${STARTDIR}/nanos-cluster-benchmarks/build/matmul_matvec_ompss2
+echo "Start running a benchmark subset." && cd ${STARTDIR}
+cd nanos-cluster-benchmarks/build/matmul_matvec_ompss2
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_blas_mpi .
 ./interactive_dim.sh -N 1,2 -R 10 -D 65536 -B 256 -I 5 \

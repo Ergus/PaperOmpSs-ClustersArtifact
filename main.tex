@@ -125,22 +125,26 @@ minutes. The benchmarks execution time depends of the problem size
 The nanos6 basic installation instructions are on:
 \href{https://github.com/bsc-pm/nanos6-cluster}{nanos6-cluster} the
 readme file explains the dependencies and some other features and it
-is updated with every release. To download build and install these are
-the needed steps.
+is updated with every release. To download build and install we can
+use the release
+\href{https://github.com/bsc-pm/ompss-2-cluster-releases}{2022.02}.
 
 \begin{lstlisting}
+git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
+cd ompss-2-cluster-releases
 export STARTDIR=${PWD}
-export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
+git submodule init
+git submodule update --depth 1
 
-git clone --depth 1 https://github.com/bsc-pm/nanos6-cluster
-cd nanos6-cluster
+export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
+cd ${STARTDIR}/nanos6-cluster
+sed -i '12i#include <cstddef>' src/memory/AddressSpace.hpp # Some compilers need this
 autoreconf -vif
-./configure --prefix=${NANOS6_HOME} \
-            --enable-cluster --enable-execution-workflow \
+./configure --enable-cluster --enable-execution-workflow --prefix=${NANOS6_HOME} \
             --disable-lint-instrumentation --disable-ctf-instrumentation \
             --disable-graph-instrumentation --disable-stats-instrumentation \
             --disable-extrae-instrumentation --disable-verbose-instrumentation
-make -j install
+make install
 \end{lstlisting}
 
 As usual the options CC=gcc CXX=g++ can be used to specify the C and
@@ -152,15 +156,14 @@ The compiler for mercurium is on:
 following steps.
 
 \begin{lstlisting}
-cd ${STARTDIR}
-export MERCURIUM_HOME=${STARTDIR}/mcxx-install
-
-git clone --depth 1 https://github.com/bsc-pm/mcxx
-cd mcxx
+echo "# Starting Mercurium installation."
+cd ${STARTDIR}/mcxx
 autoreconf -vif
-./configure --prefix=${MERCURIUM_HOME} --with-nanos6=${NANOS6_HOME} \
+export MERCURIUM_HOME=${STARTDIR}/mcxx-install
+./configure --prefix=${MERCURIUM_HOME} \
+            --with-nanos6=${NANOS6_HOME} \
             --enable-ompss-2
-make -j install
+make install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
 \end{lstlisting}
 

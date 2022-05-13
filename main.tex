@@ -51,7 +51,9 @@ comprises this set of instructions and a script, \code{build.sh}, which
 automates all the necessary steps. The script downloads and installs the Nanos6 runtime
 and the Mercurium source-to-source compiler. Then it downloads and runs a small
 subset of the benchmarks. \paul{If the relevant lines are uncommented, then it will run
-the complete set of benchmarks.}
+the complete set of benchmarks.} \paul{How much disk space is needed (very approximately) to
+do everything?}
+
 
 \section{System, Dependencies and Environment}
 
@@ -109,14 +111,19 @@ The software dependencies are:
 
 \section{Build and install}
 
+\subsection{Automated approach using the script}
+
 We provide the script \code{build.sh} to automatize the steps
-explained in this section.
+explained in this section. \paul{Where do you need to run it? 
+I suppose you need an interactive session where srun can execute
+across at least N nodes.}
 
 The script contains the same problem sizes and number of
 iterations used in the document. Such executions may take several
 hours to complete all the experiments, especially on smaller
 systems. For quick tests we recommend to divide by 4 every problem
 size (-D) and reduce the number of executions (-R) to between 1 and 3.
+\paul{How many nodes does it use? It it the same as in the document.}
 
 The script \code{build.sh} builds and downloads everything in the
 caller directory (\code{cwd}). And it creates a new file
@@ -139,6 +146,9 @@ README.md file explains the dependencies and some other features and it
 is updated with every release. To download build and install we can
 use the release
 \href{https://github.com/bsc-pm/ompss-2-cluster-releases}{2022.02}.
+
+\paul{The double hyphens look like em dashes. Maybe we need to use a different font? Some
+of the lines (here and below) extend into the margins.}
 
 \begin{lstlisting}
 git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
@@ -230,6 +240,7 @@ to check they can run in the system.
 
 We provide two sets of scripts to run the benchmarks:
 \code{interactive\_dim.sh} and \code{submiter\_dim.sh}.
+\paul{Say explicitly where these scripts are.}
 
 The following instructions apply to MPI and OmpSs-2@Cluster
 benchmarks.  They are executed in the same way, the command line
@@ -249,8 +260,8 @@ cd ${STARTDIR}/nanos-cluster-benchmarks/build/jacobi_ompss2
 mpirun -np $NP ./jacobi_task_fetchall_blas_ompss2 $DIM $BS $ITS
 \end{lstlisting}
 
-Where \code{\$NP} is the number of processes to use, \code{\$DIM} the
-problem dimension, \code{\$BS} the block size and \code{\$ITS} the
+Where \code{\$NP} is the number of processes to use, \code{\$DIM} is the
+problem dimension, \code{\$BS} is the block size and \code{\$ITS} is the
 number of iterations to execute.
 
 One example execution and its output may be:
@@ -328,9 +339,11 @@ The script also creates a file inside results named
 case you need to re-check them latter.
 
 \section{Step by step instructions}
+\paul{I don't understand the relationship between this section and the earlier one '`Running benchmarks''. This also seems
+to be the instructions to run the benchmarks.}
 
 We evaluate OmpSs-2@Cluster on
-MareNostrum\,4~\cite{MareNostrum4}. Each node has two 24-core Intel
+MareNostrum\,4~\cite{MareNostrum4} \paul{Missing citation}. Each node has two 24-core Intel
 Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48 cores per
 node.  Each socket has a shared 32\,MB L3 cache.  The HPL Rmax
 performance equates to 1.01\,TF per socket.  Communication uses Intel

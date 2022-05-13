@@ -144,6 +144,7 @@ if __name__ == "__main__":
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
 
+        plt.title("Strong Scaling " + m.group(1))
         ax.set_xlabel('Nodes')
         ax.set_ylabel("GFLOPS")
         ax.grid(color='b', ls = '-.', lw = 0.25)

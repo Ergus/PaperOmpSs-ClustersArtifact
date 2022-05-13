@@ -105,8 +105,7 @@ The script contains the same problem sizes and number of
 iterations used in the document. Such executions make take several
 hours to complete all the experiments, specially in smaller
 systems. For quick tests we recommend to divide by 4 every problem
-size (-D) and reduce the number of executions (-R) to 1-3.\footnote{In
-  cholesky the -I parameter needs to be always zero.}
+size (-D) and reduce the number of executions (-R) to 1-3.
 
 The script \code{build.sh} builds and downloads everything in the
 caller directory (\code{cwd}). And creates a new file
@@ -131,11 +130,13 @@ the needed steps.
 
 \begin{lstlisting}
 export STARTDIR=${PWD}
+export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
+
 git clone --depth 1 https://github.com/bsc-pm/nanos6-cluster
 cd nanos6-cluster
 autoreconf -vif
-export NANOS6_HOME=/some/path1
-./configure --enable-cluster --enable-execution-workflow --prefix=${NANOS6_HOME} \
+./configure --prefix=${NANOS6_HOME} \
+            --enable-cluster --enable-execution-workflow \
             --disable-lint-instrumentation --disable-ctf-instrumentation \
             --disable-graph-instrumentation --disable-stats-instrumentation \
             --disable-extrae-instrumentation --disable-verbose-instrumentation
@@ -152,12 +153,12 @@ following steps.
 
 \begin{lstlisting}
 cd ${STARTDIR}
+export MERCURIUM_HOME=${STARTDIR}/mcxx-install
+
 git clone --depth 1 https://github.com/bsc-pm/mcxx
 cd mcxx
 autoreconf -vif
-export MERCURIUM_HOME=/some/path2
-./configure --prefix=${MERCURIUM_HOME} \
-            --with-nanos6=${NANOS6_HOME} \
+./configure --prefix=${MERCURIUM_HOME} --with-nanos6=${NANOS6_HOME} \
             --enable-ompss-2
 make -j install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}

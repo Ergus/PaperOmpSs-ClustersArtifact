@@ -88,3 +88,9 @@ cp ${STARTDIR}/MPI_Benchmarks/build/cholesky_mpi/cholesky_omp_mpi .
 	cholesky_omp_mpi | tee ${STARTDIR}/output_cholesky.txt
 
 echo "# If you see this line all the benchmarks executed properly.!!"
+echo "We can try to process the output files."
+
+cd ${STARTDIR}
+./process_dim.py output_*.txt
+
+echo "# If you see this line also the output graphs were generated."

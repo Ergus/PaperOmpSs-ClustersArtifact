@@ -22,13 +22,15 @@ set -e
 exec &> >(tee -a "nanos6_automatic_build.log")
 
 start_time=${SECONDS}
+STARTDIR=${PWD}
 
 echo "# Get OmpSs-2@Cluster release."
-git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
-export STARTDIR=${PWD}
-cd ompss-2-cluster-releases
-git submodule init
-git submodule update --depth 1
+if [! -d ompss-2-cluster-releases]; then
+	git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
+	cd ompss-2-cluster-releases
+	git submodule init
+	git submodule update --depth 1
+fi
 
 echo "# Starting OmpSs-2@Cluster installation."
 cd ${STARTDIR}/ompss-2-cluster-releases/nanos6-cluster
@@ -52,16 +54,20 @@ make -j2 install
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
 
 echo "# Start nanos-cluster-benchmarks build" && cd ${STARTDIR}
-git clone --depth=1  --branch=europar https://github.com/Ergus/nanos-cluster-benchmarks
-mkdir nanos-cluster-benchmarks/build
+[-d nanos-cluster-benchmarks] || \
+	git clone --depth=1  --branch=europar https://github.com/Ergus/nanos-cluster-benchmarks
+[-d nanos-cluster-benchmarks/build] \
+	&& rm -rf nanos-cluster-benchmarks/build/* || mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make # Don't add -j here
 export NANOS6_CONFIG=${STARTDIR}/nanos6.toml
 
 echo "# Start mpi-benchmarks build" && cd ${STARTDIR}
-git clone --depth=1 --branch=europar --recursive https://github.com/Ergus/MPI_Benchmarks
-mkdir MPI_Benchmarks/build
+[-d MPI_Benchmarks] || \
+	git clone --depth=1 --branch=europar --recursive https://github.com/Ergus/MPI_Benchmarks
+[-d MPI_Benchmarks/build] \
+	&& rm -rf MPI_Benchmarks/build/* || mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make # Don't add -j here

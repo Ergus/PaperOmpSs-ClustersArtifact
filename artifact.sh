@@ -24,49 +24,53 @@ exec &> >(tee -a "nanos6_automatic_build.log")
 start_time=${SECONDS}
 STARTDIR=${PWD}
 
-echo "# Get OmpSs-2@Cluster release."
-if [! -d ompss-2-cluster-releases]; then
+if [ ! -d ompss-2-cluster-releases ]; then
+	echo "# Get OmpSs-2@Cluster release."
 	git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
 	cd ompss-2-cluster-releases
 	git submodule init
 	git submodule update --depth 1
 fi
 
-echo "# Starting OmpSs-2@Cluster installation."
-cd ${STARTDIR}/ompss-2-cluster-releases/nanos6-cluster
-sed -i '12i#include <cstddef>' src/memory/AddressSpace.hpp # Some compilers need this
-autoreconf -vif
 export NANOS6_HOME=${STARTDIR}/nanos6-cluster-install
-./configure --enable-cluster --enable-execution-workflow --prefix=${NANOS6_HOME} \
-            --disable-lint-instrumentation --disable-ctf-instrumentation \
-            --disable-graph-instrumentation --disable-stats-instrumentation \
-            --disable-extrae-instrumentation --disable-verbose-instrumentation
-make -j2 install
+if [ ! -d ${NANOS6_HOME} ]; then
+	echo "# Starting OmpSs-2@Cluster build and installation."
+	cd ${STARTDIR}/ompss-2-cluster-releases/nanos6-cluster
+	sed -i '12i#include <cstddef>' src/memory/AddressSpace.hpp # Some compilers need this
+	autoreconf -vif
+	./configure --enable-cluster --enable-execution-workflow --prefix=${NANOS6_HOME} \
+				--disable-lint-instrumentation --disable-ctf-instrumentation \
+				--disable-graph-instrumentation --disable-stats-instrumentation \
+				--disable-extrae-instrumentation --disable-verbose-instrumentation
+	make -j2 install
+fi
 
-echo "# Starting Mercurium installation."
-cd ${STARTDIR}/ompss-2-cluster-releases/mcxx
-autoreconf -vif
 export MERCURIUM_HOME=${STARTDIR}/mcxx-install
-./configure --prefix=${MERCURIUM_HOME} \
-            --with-nanos6=${NANOS6_HOME} \
-            --enable-ompss-2
-make -j2 install
+if [ ! -d ${MERCURIUM_HOME} ]; then
+	echo "# Starting Mercurium build and installation."
+	cd ${STARTDIR}/ompss-2-cluster-releases/mcxx
+	autoreconf -vif
+	./configure --prefix=${MERCURIUM_HOME} \
+				--with-nanos6=${NANOS6_HOME} \
+				--enable-ompss-2
+	make -j2 install
+fi
 export PATH=${MERCURIUM_HOME}/bin:${PATH}
 
 echo "# Start nanos-cluster-benchmarks build" && cd ${STARTDIR}
-[-d nanos-cluster-benchmarks] || \
+[ -d nanos-cluster-benchmarks ] || \
 	git clone --depth=1  --branch=europar https://github.com/Ergus/nanos-cluster-benchmarks
-[-d nanos-cluster-benchmarks/build] \
+[ -d nanos-cluster-benchmarks/build ] \
 	&& rm -rf nanos-cluster-benchmarks/build/* || mkdir nanos-cluster-benchmarks/build
 cd nanos-cluster-benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make # Don't add -j here
-export NANOS6_CONFIG=${STARTDIR}/nanos6.toml
+export NANOS6_CONFIG=${PWD}/nanos6.toml
 
 echo "# Start mpi-benchmarks build" && cd ${STARTDIR}
-[-d MPI_Benchmarks] || \
+[ -d MPI_Benchmarks ] || \
 	git clone --depth=1 --branch=europar --recursive https://github.com/Ergus/MPI_Benchmarks
-[-d MPI_Benchmarks/build] \
+[ -d MPI_Benchmarks/build ] \
 	&& rm -rf MPI_Benchmarks/build/* || mkdir MPI_Benchmarks/build
 cd MPI_Benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..

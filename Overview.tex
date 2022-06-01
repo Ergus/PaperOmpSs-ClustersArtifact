@@ -41,12 +41,19 @@
 
 \maketitle
 
-This artifact explains how to reproduce the results from our paper.
-It comprises this set of instructions and a script, \code{artifact.sh},
-which automates all the necessary steps. The script downloads and
-installs the Nanos6 runtime and the Mercurium source-to-source
-compiler. Then it downloads and runs a small subset of the
-benchmarks. The entire installation requires $<$2\,Gb of disk space.
+This artifact explains how to reproduce the scalability results from
+the main paper.  The experiments are the ones described in
+section\,5.2 of the paper and the results to reproduce are the one
+shown in Fig\,6~Section\,6.
+
+The whole artifact comprises the set of instructions in this document
+and the script \code{artifact.sh} which attempts to automate all the
+process.  The script downloads and installs the Nanos6 runtime and the
+Mercurium source-to-source compiler.  Then it downloads and runs a
+small subset of the benchmarks and constructs the graphs.  This
+requires $<$2\,Gb of disk space and takes $\sim$30 minutes to install
+the runtime and compiler.  The execution time strongly depends of the
+problem size and architecture; as explained in section\,\ref{SBS}.
 
 \section{System, Dependencies and Environment}
 
@@ -81,44 +88,70 @@ The software dependencies are:
 \begin{enumerate}
     \item automake, autoconf, libtool, pkg-config and make.
 
-    \item C and C++ compiler:  gcc\,7.2.0 and icpc\,2018.1 are known to work without
+    \item C and C++ compiler:  \href{https://gcc.gnu.org/}{gcc}\,7.2.0
+        and icpc\,2018.1 are known to work without
         issues.\footnote{To build the tests Mercurium provides different executables;
         in order to use gcc/g++ (mcc/mcxx) or icc (imc/imcxx).}
 
-    \item bison, gperf, libsqlite3 and flex.
+    \item \href{https://www.gnu.org/software/bison/}{bison},
+        \href{https://www.gnu.org/software/gperf/}{gperf},
+        \href{https://sqlite.org/version3.html}{libsqlite3} and
+        \href{https://github.com/westes/flex}{flex}.
 
-    \item boost >= 1.59: In our experiments we use boost\,1.64.0.
+    \item \href{https://www.boost.org/}{boost} >= 1.59: In our experiments
+        we use boost\,1.64.0.
 
-    \item hwloc: If you use OpenMPI then it will be a dependency as there are some
-        version constraints between OpenMPI and hwloc. In our experiments we use
+    \item \href{https://www.open-mpi.org/projects/hwloc/}{hwloc}: If you
+        use OpenMPI then it will be a dependency as there are some version
+        constraints between OpenMPI and hwloc. In our experiments we use
         hwloc 1.11.8.
 
     \item MPI library with \code{MPI\_THREAD\_MULTIPLE} support. Our communication
         uses Intel MPI\,2018.4 over 100\,Gb/s Intel OmniPath, with an HFI Silicon
-        100 series PCIe adaptor.  IMPI can be freely downloaded from the Intel
-        website \href{https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html}{IMPI};
-        but the runtime also works with OpenMPI and MPICH.\footnote{The final results may strongly depend of the MPI multithreaded
+        100 series PCIe adaptor.  \href{https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html}{IMPI}
+        can be freely downloaded from the Intel website.
+        But the runtime also works with \href{https://www.open-mpi.org/}{OpenMPI}
+        and \href{https://www.mpich.org/}{MPICH}.
+        \footnote{The final results may strongly depend of the MPI multithreaded
         support and optimization; we observed degraded performance results
         when using OpenMPI.}
 
-    \item cmake >= 3.10 and BLAS/LAPACK: to build the optimized benchmarks.
-        We use Intel MKL in our experiments. It can be freely
-        downloaded from the Intel web site:
-        \href{https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html}{oneMKL}
+    \item \href{https://cmake.org/}{cmake} >= 3.10 and BLAS/LAPACK: to build
+        the optimized benchmarks.  We use Intel MKL in our experiments.
+        It can be freely downloaded from the Intel web site:
+        \href{https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html}{oneMKL}.
+        But the benchmarks will work with \href{https://www.openblas.net/}{OpenBlas}
+        or any LAPACK implementation that the
+        \href{https://cmake.org/cmake/help/latest/module/FindLAPACK.html}{FindLAPACK}
+        module can use.
 
-    \item python3, matplotlib and pandas: to process the outputs and generate the plots.
+    \item \href{https://www.python.org/downloads/}{python3},
+        \href{https://matplotlib.org/}{matplotlib} and
+        \href{https://pandas.pydata.org/}{pandas}: to process the outputs
+        and generate the plots.
 
 \end{enumerate}
 
 \section{Build and install}
 
+The steps to complete in the artifact are:
+
+\begin{enumerate}
+    \item Build and install nanos6
+    \item Build and install Mercurium
+    \item Build the nanos6 and MPI benchmarks.
+    \item Execute the benchmarks
+    \item Process output and construct the graphs.
+\end{enumerate}
+
 \subsection{Automated approach using the script}
 
-We provide the script \code{artifact.sh} to automatize the steps
-explained in this section. To run it you need an interactive session
-with internet access (to clone the repositories) where mpi can run at
-least on two nodes because this is a scalability experiment. For more
-details see section\,\ref{SBS}.
+The script \code{artifact.sh} attempts to automatize all the process.
+The commands can be more easily copied from the script that from this
+document.  You need an interactive session with internet access (to
+clone the repositories) where mpi can run at least on two nodes
+because this is a scalability experiment.  For more details see
+section\,\ref{SBS}.
 
 \subsection{Nanos6 and Mercurium manual build and installation}\label{manuallib}
 
@@ -329,7 +362,7 @@ case you need to re-check them latter.
 The script \code{artifact.sh} builds and downloads everything in the
 caller directory (\code{cwd}). And it creates a new file
 \code{nanos6\_automatic\_build.log} that can be used to diagnose
-issues.
+issues in case of failure.
 
 The outputs are added in the same directory in different files that we
 can process individually with the provided Python script
@@ -350,6 +383,19 @@ gcc and the system LAPACK; then execute and create the plots. See the
 instructions in (\ref{manualbench}) to build with icc and MKL if they
 are available in your system. The current problem sizes are very big;
 for quick tests reduce them as explained bellow.
+
+If there is any failure during execution the
+\code{nanos6\_automatic\_build.log} provides useful
+information. That's why the script does not clean the directory on
+failure automatically.  To start again from scratch then you may need
+to manually clean the directory:
+
+\begin{lstlisting}
+rm -rf ompss-2-cluster-releases nanos-cluster-benchmarks MPI_Benchmarks
+\end{lstlisting}
+
+By default the log file is accumulative among execution, so it is your
+choice to clean it too.
 
 We evaluate OmpSs-2@Cluster on MareNostrum\,4. Each node has two
 24-core Intel Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48
@@ -405,8 +451,8 @@ outputs: \code{output\_<benchmark>.txt}.
 
 To process these files and get equivalent strong scalability than the
 Fig\,5 in the paper we provide a Python script to process the output,
-calculate the FLOPS and generate the plots (\code{artifact.sh} tries to
-call it directly):
+calculate the FLOPS and generate the plots (\code{artifact.sh} tries
+to call it directly):
 
 \begin{lstlisting}
 cd ${STARTDIR}

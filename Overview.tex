@@ -137,10 +137,11 @@ The software dependencies are:
 The steps to complete in the artifact are:
 
 \begin{enumerate}
-    \item Build and install nanos6
-    \item Build and install Mercurium
-    \item Build the nanos6 and MPI benchmarks.
-    \item Execute the benchmarks
+    \item Build and install \href{https://github.com/bsc-pm/nanos6-cluster}{Nanos6-Cluster}.
+    \item Build and install \href{https://github.com/bsc-pm/mcxx}{Mercurium}.
+    \item Build the \href{https://github.com/Ergus/nanos-cluster-benchmarks}{nanos6-cluster-benchmarks}
+        and \href{https://github.com/Ergus/MPI_Benchmarks}{MPI-benchmarks}.
+    \item Execute the benchmarks with different number of nodes.
     \item Process output and construct the graphs.
 \end{enumerate}
 
@@ -395,7 +396,9 @@ rm -rf ompss-2-cluster-releases nanos-cluster-benchmarks MPI_Benchmarks
 \end{lstlisting}
 
 By default the log file is accumulative among execution, so it is your
-choice to clean it too.
+choice to clean it too.  If the outputs were generated and the graph
+generation failed then probably you only want to call the
+\code{process.py} script as explained bellow instead of this.
 
 We evaluate OmpSs-2@Cluster on MareNostrum\,4. Each node has two
 24-core Intel Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48

@@ -43,7 +43,7 @@
 
 This artifact explains how to reproduce the scalability results from
 the main paper.  The experiments are the ones described in
-section\,5.2 of the paper and the results to reproduce are the one
+Section\,5.2 of the paper and the results to reproduce are the one
 shown in Fig\,6~Section\,6.
 
 The whole artifact comprises the set of instructions in this document
@@ -53,7 +53,7 @@ Mercurium source-to-source compiler.  Then it downloads and runs a
 small subset of the benchmarks and constructs the graphs.  This
 requires $<$2\,Gb of disk space and takes $\sim$30 minutes to install
 the runtime and compiler.  The execution time strongly depends of the
-problem size and architecture; as explained in section\,\ref{SBS}.
+problem size and architecture; as explained in Section\,\ref{SBS}.
 
 \section{System, Dependencies and Environment}
 
@@ -141,7 +141,7 @@ The steps to complete in the artifact are:
     \item Build and install \href{https://github.com/bsc-pm/mcxx}{Mercurium}.
     \item Build the \href{https://github.com/Ergus/nanos-cluster-benchmarks}{nanos6-cluster-benchmarks}
         and \href{https://github.com/Ergus/MPI_Benchmarks}{MPI-benchmarks}.
-    \item Execute the benchmarks with different number of nodes.
+    \item Execute the benchmarks with different numbers of nodes.
     \item Process output and construct the graphs.
 \end{enumerate}
 
@@ -152,11 +152,11 @@ The commands can be more easily copied from the script that from this
 document.  You need an interactive session with internet access (to
 clone the repositories) where mpi can run at least on two nodes
 because this is a scalability experiment.  For more details see
-section\,\ref{SBS}.
+Section\,\ref{SBS}.
 
 \subsection{Nanos6 and Mercurium manual build and installation}\label{manuallib}
 
-The nanos6 basic installation instructions are on:
+The Nanos6 basic installation instructions are on:
 \href{https://github.com/bsc-pm/nanos6-cluster}{nanos6-cluster} the
 README.md file explains the dependencies and some other features and
 it is updated with every release. To download build and install we can
@@ -306,10 +306,10 @@ Algorithm_time: 7.96941e+07
 \end{lstlisting}
 
 If you see a duplicated output it means that the cluster mode was not
-properly set in nanos6, so probably you are setting a wrong value for
+properly set in Nanos6, so probably you are setting a wrong value for
 \code{NANOS6\_CONFIG} or the options \code{--enable-cluster} and
 \code{--enable-execution-workflow} were missing when configuring the
-OmpSs-2@Cluster runtime library nanos6.
+OmpSs-2@Cluster runtime library Nanos6.
 
 The script \code{interactive\_dim.sh} to execute multiple benchmarks
 interactively. The script is automatically copied into the build
@@ -370,8 +370,8 @@ can process individually with the provided Python script
 \code{process\_dim.py}.
 
 The full download, build and installation may take about 30
-minutes. The benchmarks execution time depends of the problem size
-(-D), Iterations (-I) and executions (-R).
+minutes. The benchmarks execution time depends on the problem size
+(-D), Iterations (-I) and the number of executions (-R).
 
 \begin{lstlisting}
 chmod a+x artifact.sh
@@ -383,7 +383,7 @@ It will try to download the libraries, and benchmark, build them with
 gcc and the system LAPACK; then execute and create the plots. See the
 instructions in (\ref{manualbench}) to build with icc and MKL if they
 are available in your system. The current problem sizes are very big;
-for quick tests reduce them as explained bellow.
+for quick tests reduce them as explained below.
 
 If there is any failure during execution the
 \code{nanos6\_automatic\_build.log} provides useful
@@ -398,7 +398,7 @@ rm -rf ompss-2-cluster-releases nanos-cluster-benchmarks MPI_Benchmarks
 By default the log file is accumulative among execution, so it is your
 choice to clean it too.  If the outputs were generated and the graph
 generation failed then probably you only want to call the
-\code{process.py} script as explained bellow instead of this.
+\code{process.py} script as explained below instead of this.
 
 We evaluate OmpSs-2@Cluster on MareNostrum\,4. Each node has two
 24-core Intel Xeon Platinum 8160 CPUs at 2.10\,GHz, for a total of 48

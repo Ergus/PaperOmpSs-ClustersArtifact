@@ -24,6 +24,7 @@ exec &> >(tee -a "nanos6_automatic_build.log")
 start_time=${SECONDS}
 STARTDIR=${PWD}
 
+echo "# Start executing artifact: $(date)"
 if [ ! -d ompss-2-cluster-releases ]; then
 	echo "# Get OmpSs-2@Cluster release."
 	git clone --branch 2022.02 https://github.com/bsc-pm/ompss-2-cluster-releases
@@ -76,14 +77,14 @@ cd MPI_Benchmarks/build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make # Don't add -j here
 
-echo "# If you see this line installation succeeded!!"
-echo "# Build time $((SECONDS - start_time)) seconds"
-echo "# Please to run the benchmarks remember to export the following variables:"
+echo "# If you see this line the installation succeeded!!"
+echo "# Build finished $(date); elapsed $((SECONDS - start_time)) seconds"
+echo "# Please to run the benchmarks manually; remember to export the following variables:"
 echo "# NANOS6_HOME=${NANOS6_HOME}"
 echo "# NANOS6_CONFIG=${NANOS6_CONFIG}"
-echo "# And your PATH must contain ${MERCURIUM_HOME}/bin in order to use the mercurium compiler"
+echo "# And your PATH must contain ${MERCURIUM_HOME}/bin in order to build with the mercurium"
 
-echo "Start running a benchmark subset." && cd ${STARTDIR}
+echo "# Start running a benchmark subset." && cd ${STARTDIR}
 cd nanos-cluster-benchmarks/build/matmul_matvec_ompss2
 
 cp ${STARTDIR}/MPI_Benchmarks/build/matmul_matvec_mpi/matvec_parallelfor_blas_mpi .
@@ -113,10 +114,11 @@ cp ${STARTDIR}/MPI_Benchmarks/build/cholesky_mpi/cholesky_omp_mpi .
 	cholesky_omp_mpi | tee ${STARTDIR}/output_cholesky.txt
 
 echo "# If you see this line all the benchmarks executed properly.!!"
-echo "We can try to process the output files."
+echo "# End running benchmarks: $(date)"
+echo "# We can try to process the output files."
 
 cd ${STARTDIR}
 ./process_dim.py output_*.txt
 
 echo "# If you see this line also the output graphs were generated."
-echo "# Elapsed $((SECONDS - start_time)) seconds"
+echo "# End executing whole artifact: $(date); elapsed $((SECONDS - start_time)) seconds"

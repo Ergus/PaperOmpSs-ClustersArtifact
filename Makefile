@@ -15,7 +15,12 @@
 
 SHELL:=bash
 
-all: Overview.pdf
+# Check docker is available and don't scare
+DOCKER = $(shell which docker 2> /dev/null)
+doc = $(if ${DOCKER},ignore,$(error 'No docker executable in PATH'))
+
+
+all: Overview.pdf paper.pdf
 
 %.pdf: %.tex
 	latexmk -f -pdf -pdflatex="pdflatex -interaction=nonstopmode -file-line-error -synctex=1" -use-make $<
@@ -23,12 +28,20 @@ all: Overview.pdf
 artifact.zip: Overview.pdf artifact.sh process_dim.py
 	zip $@ $^
 
+paper.pdf: paper.md paper.bib
+	docker run --rm --volume $(PWD):/data \
+		--user $(id -u):$(id -g) \
+		--env JOURNAL=joss openjournals/inara \
+		-o pdf -p paper.md
+
+
 .PHONY: clean show
 
 clean:
 	latexmk -CA
 	rm -rf *.{zip,ps,pdf,log,aux,out,dvi,bbl,blg,ist,glsdefs,gls,glo,glg,xdy,synctex.gz,toc,bcf,xml,nav,snm,fls,fdb_latexmk} auto _region_.tex
+	rm -rf paper/paper.{pdf,jats}
 
-show: main.pdf
+show: Overview.pdf
 	xdg-open $< &
 

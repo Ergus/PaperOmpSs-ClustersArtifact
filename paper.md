@@ -76,17 +76,28 @@ based programming model and the
 [nanos6](https://github.com/bsc-pm/nanos6) runtime.  This artifact
 [@Aguilar2022Artifact] includes how to reproduce the scalability
 results in the main paper with the same title.  The whole artifact
-includes an **Overview** document with a detailed description of the
-actions to perform and some bash script to automatize the basic steps,
-process the results and construct the graphs.
+includes an **Overview.pdf** document with a detailed description of
+the actions to perform and a bash script **artifact.sh** to automatize
+the basic build and execution steps, process the results and construct
+performance scalability graphs.
 
 # Statement of need
 
 Reproducibility is a fundamental step in scientific development and
 research. Modern systems in High Performance Computing are more
-complex either in software and hardware making data reproduction
-cumbersome and very time consuming.
+complex either in software and hardware making results reproduction
+cumbersome and very time consuming. This artifact includes the basic
+steps for:
 
+1. Build and install [Nanos6-Cluster](https://github.com/bsc-pm/nanos6-cluster).
+2. Build and install [Mercurium](https://github.com/bsc-pm/mcxx).
+3. Build the nanos6 benchmarks set [nanos6-cluster-benchmarks](https://github.com/Ergus/nanos-cluster-benchmarks)
+4. Build the MPI benchmarks set [MPI-benchmarks](https://github.com/Ergus/MPI_Benchmarks).
+5. Instructions to execute the benchmarks to reproduce the published results.
+6. Instructions to process the output and construct the graphs.
+
+All the steps are automatized and the Overview document instruct on
+how to use the scripts and interpret the results.
 
 # Acknowledgements
 

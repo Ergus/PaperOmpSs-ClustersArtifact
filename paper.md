@@ -68,36 +68,56 @@ dependable abstraction for a wide range of hardware and situations
 within a node, but research on task offloading between nodes is still
 relatively immature.
 
-In the paper we present
 [OmpSs-2@Clusters](https://github.com/bsc-pm/ompss-2-cluster-releases)
-runtime system and programming model.  Which is the distributed memory
-evolution of the [OmpSs](https://pm.bsc.es/ftp/ompss-2/doc/spec/) task
-based programming model and the
-[nanos6](https://github.com/bsc-pm/nanos6) runtime.  This artifact
-[@Aguilar2022Artifact] includes how to reproduce the scalability
-results in the main paper with the same title.  The whole artifact
-includes an **Overview.pdf** document with a detailed description of
-the actions to perform and a bash script **artifact.sh** to automatize
-the basic build and execution steps, process the results and construct
-performance scalability graphs.
+is the evolution of the
+[OmpSs](https://pm.bsc.es/ftp/ompss-2/doc/spec/) task based
+programming model and the [nanos6](https://github.com/bsc-pm/nanos6)
+runtime implementation for distributed memory processes (DMP) system.
+This artifact [@Aguilar2022Artifact] includes how to reproduce the
+scalability results in the main paper with the same title.  The whole
+artifact includes an **Overview.pdf** document with a detailed
+description of the actions to perform and a bash script
+**artifact.sh** to automatize the basic build and execution steps,
+process the results and construct performance scalability graphs.
 
 # Statement of need
 
-Reproducibility is a fundamental step in scientific development and
-research. Modern systems in High Performance Computing are more
-complex either in software and hardware making results reproduction
-cumbersome and very time consuming. This artifact includes the basic
-steps for:
+Task based parallel computing programming models are an evolving
+research field with multiple and expanding applications in the every
+time more complex High Performance Computing (HPC) architectures. As
+[OmpSs-2@Clusters](https://github.com/bsc-pm/ompss-2-cluster-releases)
+is a new programming model there is not much documentation available
+about the installation, Advanced Programming Interface (API),
+dependencies or results with other problems.
 
-1. Build and install [Nanos6-Cluster](https://github.com/bsc-pm/nanos6-cluster).
-2. Build and install [Mercurium](https://github.com/bsc-pm/mcxx).
-3. Build the nanos6 benchmarks set [nanos6-cluster-benchmarks](https://github.com/Ergus/nanos-cluster-benchmarks)
-4. Build the MPI benchmarks set [MPI-benchmarks](https://github.com/Ergus/MPI_Benchmarks).
-5. Instructions to execute the benchmarks to reproduce the published results.
-6. Instructions to process the output and construct the graphs.
+ This artifact works as a step-by-step tutorial, but the benchmarks
+set also work as reference tests for the
+[OmpSs-2@Clusters](https://github.com/bsc-pm/ompss-2-cluster-releases)
+programming model implementation.
 
-All the steps are automatized and the Overview document instruct on
-how to use the scripts and interpret the results.
+The whole artifact comprises steps and instructions described in the
+**Overview.pdf** document and implemented in the **artifact.sh** bash
+script to simplify the user initial experience.  The fundamental parts
+are:
+
+1. Build and install
+   [Nanos6-Cluster](https://github.com/bsc-pm/nanos6-cluster) and the
+   [Mercurium](https://github.com/bsc-pm/mcxx) source to source
+   compiler
+4. Build the nanos6 benchmarks set
+   [nanos6-cluster-benchmarks](https://github.com/Ergus/nanos-cluster-benchmarks)
+   and the MPI benchmarks set
+   [MPI-benchmarks](https://github.com/Ergus/MPI_Benchmarks) to
+   compare both implementations with a baseline.
+5. Instructions to execute the benchmarks for reproducing the
+   published results.
+6. Instructions to process the output and construct the graphs
+   automatically.
+
+The provides set of [nanos6
+benchmarks](https://github.com/Ergus/nanos-cluster-benchmarks) also
+include different optimization versions and easily support different
+external libraries, compilers and debugging options.
 
 # Acknowledgements
 

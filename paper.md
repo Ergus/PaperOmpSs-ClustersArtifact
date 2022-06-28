@@ -65,7 +65,7 @@ This work presents the
 [Nanos6@Cluster](https://github.com/bsc-pm/ompss-2-cluster-releases)
 runtime system, which is the reference runtime system implementation for the [OmpSs-2@Cluster]**(cite EuroPar paper)** programming model.  OmpSs-2@Cluster is the flexible distributed memory variant of [OmpSs](https://pm.bsc.es/ftp/ompss-2/doc/spec/), which supports offloading of tasks among nodes. The program inherits task ordering from the sequential version of the code and it uses a common address space to avoid address translation and simplify the use of data structures with pointers.
 
-We also include four benchmarks for evaluation, together with the scripts (artifact.sh) and documentation (Overview.pdf) needed to reproduce the results in the paper. As such, we hope to enable future researchers to reproduce our work, compare alternative approaches with state-of-the-art and build on our work to exploit the task offloading support for resilience, malleability, load balancing (**Cite ICPP**) and other purposes.
+We also include four benchmarks for evaluation, together with the scripts (artifact.sh) and documentation (Overview.pdf) needed to reproduce the results in the paper. As such, we hope to enable future researchers to reproduce and evaluate our work, compare alternative approaches with state-of-the-art and build on our work to exploit the task offloading support for resilience, malleability, load balancing (**Cite ICPP**) and other purposes.
 
 # Statement of need
 
@@ -74,30 +74,16 @@ division between intra-node shared memory parallelism and inter-node
 MPI communication.  Tasking with dependencies offers a clean,
 dependable abstraction for a wide range of hardware and situations
 within a node, but research to extend the model to encompass parallelism among nodes is still
-relatively immature.
+relatively immature. 
 
 This work presents 
 [Nanos6@Cluster](https://github.com/bsc-pm/ompss-2-cluster-releases), which is the reference runtime system implementation for the [OmpSs-2@Cluster]**(cite EuroPar paper)** programming model.  OmpSs-2@Cluster is the flexible distributed memory variant of [OmpSs](https://pm.bsc.es/ftp/ompss-2/doc/spec/), which supports offloading of tasks among nodes. The application inherits task ordering from the sequential version of the code and it uses a common address space to avoid address translation and simplify the use of data structures with pointers.
 
-Nanos6@Cluster has been under development since **Check date** is a derivative of [Nanos6](https://github.com/bsc-pm/nanos6), which has been in development since **Check date**.  It implements the programming model support and the runtime optimizations described in the EuroPar publication. We also include the Mercurium source-to-source compiler, with extensions for OmpSs-2@Cluster and four benchmarks: matvec, matmul, jacobi and cholesky, together with the scripts (artifact.sh) and documentation (Overview.pdf) needed to reproduce the results in the paper.
-
-Task based parallel computing programming models are an evolving
-research field with multiple and expanding applications in the every
-time more complex High Performance Computing (HPC) architectures. As
-[OmpSs-2@Clusters](https://github.com/bsc-pm/ompss-2-cluster-releases)
-is a new programming model there is not much documentation available
-about the installation, Advanced Programming Interface (API),
-dependencies or results with other problems.
-
- This artifact works as a step-by-step tutorial, but the benchmarks
-set also work as reference tests for the
-[OmpSs-2@Clusters](https://github.com/bsc-pm/ompss-2-cluster-releases)
-programming model implementation.
+Nanos6@Cluster has been under development since **Check date**, and it is a derivative of [Nanos6](https://github.com/bsc-pm/nanos6), which has been in development since **Check date**.  It implements the complete OmpSs-2@Cluster programming model and the runtime optimizations described in the EuroPar publication. We also include the Mercurium source-to-source compiler, with extensions for OmpSs-2@Cluster and four benchmarks: matvec, matmul, jacobi and cholesky, together with the scripts (artifact.sh) and documentation (Overview.pdf) needed to reproduce the results in the paper.
 
 The whole artifact comprises steps and instructions described in the
 **Overview.pdf** document and implemented in the **artifact.sh** bash
-script to simplify the user initial experience.  The fundamental parts
-enable the user to:
+script to simplify the user initial experience.  The fundamental parts enable the user to:
 
 1. Build and install
    [Nanos6-Cluster](https://github.com/bsc-pm/nanos6-cluster) and the
@@ -111,14 +97,12 @@ enable the user to:
 5. Execute the benchmarks and reproduce the published results.
 6. Process the output to construct the graphs automatically.
 
-The provides set of [nanos6
-benchmarks](https://github.com/Ergus/nanos-cluster-benchmarks) also
-include different optimization versions and easily support different
-external libraries, compilers and debugging options.
+The provided [benchmarks suite](https://github.com/Ergus/nanos-cluster-benchmarks) also
+includes multiple variants of the benchmarks with different levels of optimization, and it easily supports different external libraries, compilers and debugging options.
 
-All steps are automated and the Overview.pdf document describes how to use the scripts to interpret the results. The key references for this work are **Cite EuroPar**, as well as **Cite ICPP** for work on dynamic load balancing.
+The key references for this work are **Cite EuroPar**, as well as **Cite ICPP** for work on dynamic load balancing.
 
-By releasing our work as open source, we wish to enable future researchers to reproduce our work, compare alternative approaches with our state-of-the-art and build on our work to exploit OmpSs-2@Cluster task offloading to improve support for resilience, malleability, load balancing (**Cite ICPP**) and other purposes.
+By releasing our work as open source, we wish to enable future researchers to reproduce and evaluate our work, compare it with alternative approaches, and build on our work to exploit OmpSs-2@Cluster task offloading to improve support for resilience, malleability, load balancing (**Cite ICPP**) and other purposes.
 
 # Acknowledgements
 

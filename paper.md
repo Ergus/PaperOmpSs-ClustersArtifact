@@ -138,13 +138,13 @@ parts enable the user to:
    [Nanos6-Cluster](https://github.com/bsc-pm/nanos6-cluster) and the
    [Mercurium](https://github.com/bsc-pm/mcxx) source-to-source
    compiler
-4. Build the Nanos6 benchmarks suite
+2. Build the Nanos6 benchmarks suite
    [nanos6-cluster-benchmarks](https://github.com/Ergus/nanos-cluster-benchmarks)
    and the MPI benchmarks suite
    [MPI-benchmarks](https://github.com/Ergus/MPI_Benchmarks) to
    compare both implementations with a baseline.
-5. Execute the benchmarks and reproduce the published results.
-6. Process the output to construct the graphs automatically.
+3. Execute the benchmarks and reproduce the published results.
+4. Process the output to construct the graphs automatically.
 
 The provided [benchmarks
 suite](https://github.com/Ergus/nanos-cluster-benchmarks) also

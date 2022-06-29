@@ -92,6 +92,16 @@ dependable abstraction for a wide range of hardware and situations
 within a node, but research to extend the model to encompass
 parallelism among nodes is still relatively immature.
 
+[OpenMP](https://www.openmp.org/specifications/) is the most popular
+alternative for asynchronous task programming in Shared Memory
+systems. Over the years OmpSs has influenced OpenMP with multiple
+features as explained in [@OmpSsOpenMP]. Besides that, extending
+applications among multiple nodes requires hybrid programming
+techniques to mix OpenMP code with Message Passing Interface
+[MPI](https://www.mpi-forum.org/) for communications. This usually
+leads is complex code that requires extra effort to maintain and
+optimize the different levels of parallelism.
+
 This work presents
 [Nanos6@Cluster](https://github.com/bsc-pm/ompss-2-cluster-releases),
 which is the reference runtime system implementation for the
@@ -106,14 +116,15 @@ data structures with pointers.
 Nanos6@Cluster has been under development since 2016, and it is a
 derivative of [Nanos6](https://github.com/bsc-pm/nanos6), which has
 been in development since 2015 as a successor for
-[Nanos++](https://pm.bsc.es/nanox).  It implements the complete
+[Nanos++](https://pm.bsc.es/nanox). It implements the complete
 OmpSs-2@Cluster programming model and the runtime optimizations
-described in the EuroPar publication [@Aguilar2022Europar]. We also
-include the [Mercurium](https://github.com/bsc-pm/mcxx)
+described in the EuroPar publication [@Aguilar2022Europar].
+
+We also include the [Mercurium](https://github.com/bsc-pm/mcxx)
 source-to-source compiler, with extensions for OmpSs-2@Cluster and a
 set of [benchmarks](https://github.com/Ergus/nanos-cluster-benchmarks)
 with multiple implementations for four benchmarks: matvec, matmul,
-jacobi and cholesky
+jacobi and cholesky.
 
 The whole artifact [@Aguilar2022Artifact] comprises steps and
 instructions described in the
